@@ -6,7 +6,7 @@
         public int gridX, gridY;
         public bool walkable;
         public int gCost, hCost;
-
+        public Node parent;
         public Node(double worldX, double worldY, int gridX, int gridY, bool walkable)
         {
             this.worldX = worldX;
@@ -17,10 +17,14 @@
 
             gCost = 0;
             hCost = 0;
+
+            parent = null;
         }
-        public int fCost()
-        {
-            return gCost + hCost;
+        public int fCost {
+            get
+            {
+                return gCost + hCost;
+            }
         }
     }
 }

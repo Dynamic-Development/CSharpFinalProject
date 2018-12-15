@@ -44,8 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enemy.cs" />
+    <Compile Include="AI\Pathfinder.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Grid.cs" />
+    <Compile Include="Level.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

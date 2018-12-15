@@ -29,11 +29,13 @@ namespace C_Sharp_Final_Project
                 isRunning = true;
             }  
         }
-        public void SetUpNextLevel(string levelFilePath) //Calls in Update
+
+        private void SetUpNextLevel(string levelFilePath) //Calls in Update
         {
             currentLevel = new Level(levelFilePath);
             Grid = currentLevel.grid;
         }
+
         public void HandleEvents()
         {
             SDL_Event events;
@@ -46,9 +48,7 @@ namespace C_Sharp_Final_Project
                 default:
                     isRunning = true;
                     break;
-
             }
-
         }
 
         public void Update()

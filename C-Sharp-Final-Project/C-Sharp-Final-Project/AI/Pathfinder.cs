@@ -19,8 +19,8 @@ namespace C_Sharp_Final_Project.EnemyAI
             Node startNode = Game.Grid.NodeFromWorld(xPos, yPos);
             Node targetNode = Game.Grid.NodeFromWorld(targetXPos, targetYPos);
 
-            List<Node> openSet = new List<Node>;
-            HashSet<Node> closedSet = new HashSet<Node>;
+            List<Node> openSet = new List<Node>();
+            HashSet<Node> closedSet = new HashSet<Node>();
             openSet.Add(startNode);
 
             while (openSet.Count > 0)

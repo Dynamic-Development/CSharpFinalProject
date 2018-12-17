@@ -15,7 +15,7 @@ namespace C_Sharp_Final_Project
         public static int Height;
 
         public Game(){}
-
+        private Enemy enemy;
         public void Init(string title, int xPos, int yPos, int width, int height)
         {
             SDL_WindowFlags flags = 0;
@@ -27,7 +27,8 @@ namespace C_Sharp_Final_Project
                 Renderer = SDL_CreateRenderer(window, -1, 0);
                 SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
                 isRunning = true;
-            }  
+            }
+            enemy = new Enemy(100, 100, 32, 32, "Textures/Test2.png");
         }
 
         private void SetUpNextLevel(string levelFilePath) //Calls in Update
@@ -54,6 +55,7 @@ namespace C_Sharp_Final_Project
         public void Update()
         {
             //Update Objects
+            enemy.Update();
         }
 
         public void Render()
@@ -62,6 +64,7 @@ namespace C_Sharp_Final_Project
             SDL_RenderClear(Renderer);
 
             //Render Objects
+            enemy.Render();
 
             SDL_RenderPresent(Renderer);
         }

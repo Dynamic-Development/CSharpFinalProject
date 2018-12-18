@@ -9,9 +9,9 @@ namespace C_Sharp_Final_Project
         private int ypos;
         private IntPtr texture;
         private SDL_Rect dest;
-
-        private int xvel;
-        private int yvel;
+        
+        public int xvel;
+        public int yvel;
         public Player(int posx , int posy, int width, int height, string texturePath)
         {
             xpos = posx;
@@ -24,11 +24,16 @@ namespace C_Sharp_Final_Project
             dest.h = height;
 
         }
-        public void EventHandler(SDL_EventType e)
-        {
-        }
+        
         public void Update()
         {
+            xpos = xpos + (xvel * 5);
+            ypos = ypos + (yvel * 5);
+            xvel = 0;
+            yvel = 0;
+
+
+
             dest.x = (int)xpos - dest.w / 2;
             dest.y = (int)ypos - dest.h / 2;
         }

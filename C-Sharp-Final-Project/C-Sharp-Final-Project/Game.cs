@@ -13,9 +13,11 @@ namespace C_Sharp_Final_Project
         public static Grid Grid;
         public static int Width;
         public static int Height;
+        private Enemy enemy;
+        private Player player;
 
         public Game(){}
-        private Enemy enemy;
+        
         public void Init(string title, int xPos, int yPos, int width, int height)
         {
             SDL_WindowFlags flags = 0;
@@ -29,6 +31,7 @@ namespace C_Sharp_Final_Project
                 isRunning = true;
             }
             enemy = new Enemy(100, 100, 32, 32, "Textures/Test2.png");
+            player = new Player(200, 100, 32, 32, "Textures/PlayerPlaceholder.png");
         }
 
         private void SetUpNextLevel(string levelFilePath) //Calls in Update
@@ -46,9 +49,21 @@ namespace C_Sharp_Final_Project
                 case SDL_EventType.SDL_QUIT:
                     isRunning = false;
                     break;
+                case SDL_EventType.SDL_KEYDOWN:
+                    if (events.key.keysym.sym == SDL_Keycode.SDLK_w)
+                        player.yvel--;
+                    if (events.key.keysym.sym == SDL_Keycode.SDLK_a)
+                        player.xvel--;
+                    if (events.key.keysym.sym == SDL_Keycode.SDLK_s)
+                        player.yvel++;
+                    if (events.key.keysym.sym == SDL_Keycode.SDLK_d)
+                        player.xvel++;
+
+                    break;
                 default:
                     isRunning = true;
                     break;
+
             }
         }
 
@@ -56,6 +71,7 @@ namespace C_Sharp_Final_Project
         {
             //Update Objects
             enemy.Update();
+            player.Update();
         }
 
         public void Render()
@@ -65,6 +81,7 @@ namespace C_Sharp_Final_Project
 
             //Render Objects
             enemy.Render();
+            player.Render();
 
             SDL_RenderPresent(Renderer);
         }

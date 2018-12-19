@@ -15,6 +15,7 @@ namespace C_Sharp_Final_Project
         public static int Height;
         private Enemy enemy;
         private Player player;
+        public bool[] playermover = new bool[4];
 
         public Game(){}
         
@@ -31,7 +32,7 @@ namespace C_Sharp_Final_Project
                 isRunning = true;
             }
             enemy = new Enemy(100, 100, 32, 32, "Textures/Test2.png");
-            player = new Player(200, 100, 32, 32, "Textures/PlayerPlaceholder.png");
+            player = new Player(200, 100, 56, 36, "Textures/Player.png");
         }
 
         private void SetUpNextLevel(string levelFilePath) //Calls in Update
@@ -51,14 +52,23 @@ namespace C_Sharp_Final_Project
                     break;
                 case SDL_EventType.SDL_KEYDOWN:
                     if (events.key.keysym.sym == SDL_Keycode.SDLK_w)
-                        player.yvel--;
+                        playermover[0] = true;
                     if (events.key.keysym.sym == SDL_Keycode.SDLK_a)
-                        player.xvel--;
+                        playermover[1] = true;
                     if (events.key.keysym.sym == SDL_Keycode.SDLK_s)
-                        player.yvel++;
+                        playermover[2] = true;
                     if (events.key.keysym.sym == SDL_Keycode.SDLK_d)
-                        player.xvel++;
-
+                        playermover[3] = true;
+                    break;
+                case SDL_EventType.SDL_KEYUP:
+                    if (events.key.keysym.sym == SDL_Keycode.SDLK_w)
+                        playermover[0] = false;
+                    if (events.key.keysym.sym == SDL_Keycode.SDLK_a)
+                        playermover[1] = false;
+                    if (events.key.keysym.sym == SDL_Keycode.SDLK_s)
+                        playermover[2] = false;
+                    if (events.key.keysym.sym == SDL_Keycode.SDLK_d)
+                        playermover[3] = false;
                     break;
                 default:
                     isRunning = true;
@@ -69,9 +79,27 @@ namespace C_Sharp_Final_Project
 
         public void Update()
         {
+            if (playermover[0] == true)
+            {
+                player.yvel--;
+            }
+            if (playermover[1] == true)
+            {
+                player.xvel--;
+            }
+            if (playermover[2] == true)
+            {
+                player.yvel++;
+            }
+            if (playermover[3] == true)
+            {
+                player.xvel++;
+            }
+
             //Update Objects
             enemy.Update();
             player.Update();
+            
         }
 
         public void Render()

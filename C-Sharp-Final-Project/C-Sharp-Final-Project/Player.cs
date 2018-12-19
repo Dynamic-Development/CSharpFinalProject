@@ -29,7 +29,8 @@ namespace C_Sharp_Final_Project
         {
             xpos = xpos + (xvel * 5);
             ypos = ypos + (yvel * 5);
-
+            xvel = 0;
+            yvel = 0;
             dest.x = (int)xpos - dest.w / 2;
             dest.y = (int)ypos - dest.h / 2;
         }

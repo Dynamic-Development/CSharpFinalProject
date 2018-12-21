@@ -44,11 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\Heap.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="AI\Pathfinder.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Grid.cs" />
-    <Compile Include="Level.cs" />
+    <Compile Include="Scene.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="SDL2-CS\SDL2_mixer.cs" />
     <Compile Include="SDL2-CS\SDL2_ttf.cs" />
     <Compile Include="Textures.cs" />
+    <Compile Include="Tile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

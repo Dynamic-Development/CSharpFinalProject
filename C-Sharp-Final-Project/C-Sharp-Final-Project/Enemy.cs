@@ -18,7 +18,7 @@ namespace C_Sharp_Final_Project
         private List<Node> nodePath;
         private int findPathCoolDown;
         private int nodeIndex;
-
+        
         public Enemy(int xPos, int yPos, int width, int height, string texture)
         {
             pathfind = new EnemyAI.Pathfinder();
@@ -40,20 +40,20 @@ namespace C_Sharp_Final_Project
         {
 
             //TODO: Finish Pathfinding
-            /* COOLDOWN NONFUNCIONAL if (CoolDown(ref findPathCoolDown, 20))
+            /*
+            if (CoolDown(ref findPathCoolDown, 20))
             {
-                nodePath = pathfind.ReturnPath((int)xPos, (int)yPos, Game.Player.xPos, Game.Player.yPos); //TODO: Add player object
+                nodePath = pathfind.ReturnPath((int)xPos, (int)yPos, Game.Player.xpos, Game.Player.ypos); //TODO: Add player object
                 nodeIndex = 0;
             }
-            
-            
-            if (nodeIndex < nodePath.Count && distanceToPlayer > SHOOTING_RANGE)
+            */
+            /*
+            if (nodeIndex < nodePath.Count /*&& distanceToPlayer > SHOOTING_RANGE /*&& sawPlayer)
             {
                 VelocityInDirection((int)nodePath[nodeIndex].worldX, (int)nodePath[nodeIndex].worldY);
                 nodeIndex++;
             }
             */
-
             xPos += xVel;
             yPos += yVel;
 

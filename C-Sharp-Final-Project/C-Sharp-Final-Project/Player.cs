@@ -5,8 +5,8 @@ namespace C_Sharp_Final_Project
 {
     class Player
     {
-        private int xpos;
-        private int ypos;
+        public int xpos;
+        public int ypos;
         private IntPtr texture;
         private SDL_Rect dest;
         
@@ -20,19 +20,25 @@ namespace C_Sharp_Final_Project
             xvel = 0;
             yvel = 0;
             texture = Textures.LoadTexture(texturePath);
+
             dest.w = width;
             dest.h = height;
-
         }
         
         public void Update()
-        {
+        {   
+            if (Game.KeyStates[0]) yvel--;
+            if (Game.KeyStates[1]) xvel--;
+            if (Game.KeyStates[2]) yvel++;
+            if (Game.KeyStates[3]) xvel++;
+
             xpos = xpos + (xvel * 5);
             ypos = ypos + (yvel * 5);
             xvel = 0;
             yvel = 0;
-            dest.x = (int)xpos - dest.w / 2;
-            dest.y = (int)ypos - dest.h / 2;
+
+            dest.x = xpos - dest.w / 2;
+            dest.y = ypos - dest.h / 2;
         }
         public void Render()
         {

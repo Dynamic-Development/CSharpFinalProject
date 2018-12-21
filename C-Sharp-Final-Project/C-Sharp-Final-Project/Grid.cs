@@ -5,29 +5,37 @@ namespace C_Sharp_Final_Project
 {
     class Grid
     {
+        public int tileWidth;
+        public int tileHeight;
+        public Node[,] worldNodes;
+
+        private const int NODES_PER_TILE = 3;
+
         private double nodeWidth, nodeHeight;
         private double halfNodeWidth, halfNodeHeight;
         private int numNodeWidth, numNodeHeight;
-        public Node[,] worldNodes;
-        public Grid(int worldWidth, int worldHeight, int numNodeWidth, int numNodeHeight)
+
+        public Grid(int worldWidth, int worldHeight, int numTileWidth, int numTileHeight)
         {
+            numNodeWidth = numTileWidth * NODES_PER_TILE;
+            numNodeHeight = numTileHeight * NODES_PER_TILE;
             nodeWidth = worldWidth / numNodeWidth;
             nodeHeight = worldHeight / numNodeHeight;
             halfNodeHeight = numNodeHeight / 2;
             halfNodeWidth = numNodeWidth / 2;
             worldNodes = new Node[numNodeWidth, numNodeHeight];
-
-            this.numNodeWidth = numNodeWidth;
-            this.numNodeHeight = numNodeHeight;
+            tileHeight = worldHeight / numTileHeight;
+            tileWidth = worldWidth / numTileWidth;
 
             double nodex, nodey;
-            for (int x = 0; x < numNodeWidth; x++)
+            for (int x = 0; x < numNodeWidth; x++) { 
+                nodex = halfNodeWidth + (nodeWidth * x);
                 for (int y = 0; y < numNodeHeight; y++)
                 {
-                    nodex = halfNodeWidth + (nodeWidth * x);
-                    nodey = halfNodeHeight + (nodeHeight * x);
-                    worldNodes[x, y] = new Node(nodex, nodey, x, y, true); 
+                    nodey = halfNodeHeight + (nodeHeight * y);
+                    worldNodes[x, y] = new Node(nodex, nodey, x, y, true);
                 }
+            }
         }
         public List<Node> NodeNeighbors(Node node)
         {
@@ -57,15 +65,17 @@ namespace C_Sharp_Final_Project
 
             return worldNodes[xi, yi];
         }
-        public Node[] GroupNodesInArea(int tileUnitsX, int tileUnitsY, int tileUnitsWidth, int tileUnitsHeight)
+        public Node[] GroupNodesTileArea(int fromXTile, int fromYTile, int widthTiles, int heightTiles)
         {
-            Node[] nodeInUnitsArea = new Node[tileUnitsHeight * tileUnitsWidth];
+            Node[] nodeInTileArea = new Node[(heightTiles) * (widthTiles) * NODES_PER_TILE * NODES_PER_TILE];
+            int fromXNode = fromXTile * NODES_PER_TILE;
+            int fromYNode = fromYTile * NODES_PER_TILE;
             int tempIndex = 0;
-            for (int x = tileUnitsX; x < tileUnitsWidth; x++)
-                for (int y = tileUnitsY; y < tileUnitsHeight; y++)
-                    nodeInUnitsArea[tempIndex++] = worldNodes[x, y];
-
-            return nodeInUnitsArea;
+            for (int x = fromXNode; x < ((widthTiles) * NODES_PER_TILE + fromXNode); x++)
+                for (int y = fromYNode; y < ((heightTiles) * NODES_PER_TILE + fromYNode); y++) {
+                    nodeInTileArea[tempIndex++] = worldNodes[x, y];
+                }
+            return nodeInTileArea;
         }
     }
 }

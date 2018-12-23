@@ -8,7 +8,6 @@ namespace C_Sharp_Final_Project
     {
         private bool isRunning;
         private IntPtr window;
-        private Scene currentScene;
 
         public static IntPtr Renderer;
         public static Grid Grid;
@@ -17,7 +16,7 @@ namespace C_Sharp_Final_Project
         public static Player Player;
         public static PathMaster PathManager;
 
-        private Enemy enemy; // make into array soon
+        private List<Enemy> enemy; // make into array soon
 
         public static bool[] KeyStates = new bool[4];
         public static List<Tile> Walls = new List<Tile>();
@@ -38,7 +37,11 @@ namespace C_Sharp_Final_Project
             }
             PathManager = new PathMaster();
 
-            enemy = new Enemy(300, 100, 32, 32, "Textures/Test2.png");
+            enemy = new List<Enemy>
+            {
+                new Enemy(300, 100, 32, 32, "Textures/Test2.png"),
+                new Enemy(200, 200, 32, 32, "Textures/Test2.png")
+            };
             Player = new Player(400, 200, 56, 36, "Textures/Player.png");
             Scene.SetUpScene("Scenes/level1.txt");
         }
@@ -74,9 +77,10 @@ namespace C_Sharp_Final_Project
         public void Update()
         {
             //Update Objects
-            enemy.Update();
+            for (int e = 0; e < enemy.Count; e++)
+                enemy[e].Update();
             Player.Update();
-            PathManager.TryProcessNext(Component.CoolDown(ref PathManager.nextPathCoolDown, 60));
+            PathManager.TryProcessNext(Component.CoolDown(ref PathManager.nextPathCoolDown, 20));
         }
 
         public void Render()
@@ -85,13 +89,13 @@ namespace C_Sharp_Final_Project
             SDL_RenderClear(Renderer);
 
             //Render Objects
-            enemy.Render();
-            Player.Render();
 
+            Player.Render();
+            for (int e = 0; e < enemy.Count; e++)
+                enemy[e].Render();
             for (int i = 0; i < Walls.Count; i++)
-            {
-               Walls[i].Render();
-            }
+                Walls[i].Render();
+            
             //Grid.RenderNodes();
 
             SDL_RenderPresent(Renderer);

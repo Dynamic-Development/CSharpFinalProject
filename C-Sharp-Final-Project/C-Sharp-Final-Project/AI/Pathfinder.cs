@@ -61,8 +61,20 @@ namespace C_Sharp_Final_Project
                 nodePath.Add(currentNode);
                 currentNode = currentNode.parent;
             }
+
             nodePath.Reverse();
-     
+
+            List<int> wayPointsXList = new List<int>();
+            List<int> wayPointsYList = new List<int>();
+            for (int i = 1; i < nodePath.Count; i++)
+            {
+                wayPointsXList.Add((int)nodePath[i].worldX);
+                wayPointsYList.Add((int)nodePath[i].worldY);
+            }
+            wayPointsX = wayPointsXList.ToArray();
+            wayPointsY = wayPointsYList.ToArray();
+
+            /*
             int directionXNew = 0;
             int directionYNew = 0;
             int directionXOld = 0;
@@ -83,7 +95,7 @@ namespace C_Sharp_Final_Project
             }
             wayPointsX = wayPointsXList.ToArray();
             wayPointsY = wayPointsYList.ToArray();
-           
+           */
         }
 
         private int NodeDistance(Node nodea, Node nodeb)

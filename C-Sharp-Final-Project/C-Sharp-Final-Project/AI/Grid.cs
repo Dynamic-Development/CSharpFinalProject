@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static SDL2.SDL;
 
 namespace C_Sharp_Final_Project
 {
@@ -8,12 +9,14 @@ namespace C_Sharp_Final_Project
         public int tileWidth;
         public int tileHeight;
         public Node[,] worldNodes;
+        public int numNodeWidth, numNodeHeight;
 
         private const int NODES_PER_TILE = 3;
 
         private double nodeWidth, nodeHeight;
         private double halfNodeWidth, halfNodeHeight;
-        private int numNodeWidth, numNodeHeight;
+
+        SDL_Rect rect;
 
         public Grid(int worldWidth, int worldHeight, int numTileWidth, int numTileHeight)
         {
@@ -21,8 +24,8 @@ namespace C_Sharp_Final_Project
             numNodeHeight = numTileHeight * NODES_PER_TILE;
             nodeWidth = worldWidth / numNodeWidth;
             nodeHeight = worldHeight / numNodeHeight;
-            halfNodeHeight = numNodeHeight / 2;
-            halfNodeWidth = numNodeWidth / 2;
+            halfNodeHeight = nodeHeight / 2;
+            halfNodeWidth = nodeWidth / 2;
             worldNodes = new Node[numNodeWidth, numNodeHeight];
             tileHeight = worldHeight / numTileHeight;
             tileWidth = worldWidth / numTileWidth;
@@ -36,6 +39,10 @@ namespace C_Sharp_Final_Project
                     worldNodes[x, y] = new Node(nodex, nodey, x, y, true);
                 }
             }
+
+            rect.w = (int) nodeWidth;
+            rect.h = (int)nodeHeight;
+
         }
         public List<Node> NodeNeighbors(Node node)
         {
@@ -50,23 +57,29 @@ namespace C_Sharp_Final_Project
 
                     gridX = node.gridX + x;
                     gridY = node.gridY + y;
-
+                   
                     if ((gridX >= 0) && (gridX < numNodeWidth) &&
-                        (gridY >= 0) && (gridX < numNodeHeight))
-                        neighbors.Add(worldNodes[x, y]);
+                        (gridY >= 0) && (gridY < numNodeHeight))
+                    {
+                        neighbors.Add(worldNodes[gridX, gridY]);
+                    }
                 }
 
             return neighbors;
         }
+
         public Node NodeFromWorld(int worldX, int worldY)
         {
-            int xi = (int) Math.Round((worldX - halfNodeWidth) / (nodeWidth), MidpointRounding.AwayFromZero);
-            int yi = (int) Math.Round((worldX - halfNodeHeight) / (nodeHeight), MidpointRounding.AwayFromZero);
+            int xi = (int) Math.Round((worldX - halfNodeWidth) / nodeWidth, MidpointRounding.AwayFromZero);
+            int yi = (int) Math.Round((worldY - halfNodeHeight) / nodeHeight, MidpointRounding.AwayFromZero);
 
             return worldNodes[xi, yi];
         }
-        public Node[] GroupNodesTileArea(int fromXTile, int fromYTile, int widthTiles, int heightTiles)
+
+        public Node[] GroupNodesTileArea(int fromXTile, int fromYTile, int toXTile, int toYTile)
         {
+            int widthTiles = toXTile - fromXTile;
+            int heightTiles = toYTile - fromXTile;
             Node[] nodeInTileArea = new Node[(heightTiles) * (widthTiles) * NODES_PER_TILE * NODES_PER_TILE];
             int fromXNode = fromXTile * NODES_PER_TILE;
             int fromYNode = fromYTile * NODES_PER_TILE;
@@ -76,6 +89,26 @@ namespace C_Sharp_Final_Project
                     nodeInTileArea[tempIndex++] = worldNodes[x, y];
                 }
             return nodeInTileArea;
+        }
+
+        public void RenderNodes()
+        {
+            foreach(Node n in worldNodes)
+            {
+                rect.x = (int)(n.worldX - (nodeWidth / 2));
+                rect.y = (int)(n.worldY - (nodeHeight / 2));
+
+                if (n.walkable)
+                {
+                    SDL_SetRenderDrawColor(Game.Renderer, 0, 0, 0, 0);
+
+                } else
+                {
+                    SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 255, 255);
+                }
+                SDL_RenderFillRect(Game.Renderer, ref rect);
+            }
+
         }
     }
 }

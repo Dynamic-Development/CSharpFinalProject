@@ -1,45 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
-namespace C_Sharp_Final_Project.EnemyAI
+namespace C_Sharp_Final_Project
 {
     class Pathfinder
     {
-        private List<Node> nodePath;
+        int[] wayPointsX;
+        int[] wayPointsY;
 
-        public Pathfinder() { }
-        public List<Node> ReturnPath(int xPos, int yPos, int targetXPos, int targetYPos)
+        public void FindPath(int xPos, int yPos, int targetXPos, int targetYPos)
         {
-            FindPath(xPos, yPos, targetXPos, targetYPos);
-            return nodePath;
-        }
-        private void FindPath(int xPos, int yPos, int targetXPos, int targetYPos)
-        {
+            bool success = false;
+
             Node startNode = Game.Grid.NodeFromWorld(xPos, yPos);
             Node targetNode = Game.Grid.NodeFromWorld(targetXPos, targetYPos);
-
-            List<Node> openSet = new List<Node>();
+            
+            Heap<Node> openSet = new Heap<Node>(Game.Grid.numNodeHeight * Game.Grid.numNodeWidth);
             HashSet<Node> closedSet = new HashSet<Node>();
             openSet.Add(startNode);
 
             while (openSet.Count > 0)
             {
-                Node currentNode = openSet[0];
-                for (int i = 1; i < openSet.Count; i++)
-                {
-                    if (openSet[i].fCost < currentNode.fCost || 
-                        openSet[i].fCost == currentNode.fCost && 
-                        openSet[i].hCost < currentNode.hCost)
-                        currentNode = openSet[i];
-                }
-
-                openSet.Remove(currentNode);
+                Node currentNode = openSet.RemoveFirst();       
                 closedSet.Add(currentNode);
 
                 if (currentNode == targetNode)
                 {
-                    RetracePath(startNode, targetNode);
+                    success = true;
+                    break;
                 }
 
                 foreach(Node neighbor in Game.Grid.NodeNeighbors(currentNode))
@@ -47,22 +35,26 @@ namespace C_Sharp_Final_Project.EnemyAI
                     if (!neighbor.walkable || closedSet.Contains(neighbor))
                         continue;
                     int moveCost = currentNode.gCost + NodeDistance(currentNode, neighbor);
-                    if (moveCost < neighbor.gCost ||
-                        !openSet.Contains(neighbor))
+                    if (moveCost < neighbor.gCost || !openSet.Contains(neighbor))
                     {
                         neighbor.gCost = moveCost;
                         neighbor.hCost = NodeDistance(neighbor, targetNode);
                         neighbor.parent = currentNode;
                         if (!openSet.Contains(neighbor))
                             openSet.Add(neighbor);
+                        else
+                           openSet.UpdateItem(neighbor);                      
                     }
-
                 }
             }
+            if (success)
+                RetracePath(startNode, targetNode);
+            Game.PathManager.FinishedrocessingPath(wayPointsX, wayPointsY, success);
         }
+
         private void RetracePath(Node startNode, Node targetNode)
-        {
-            nodePath = new List<Node>();
+        { 
+            List<Node> nodePath = new List<Node>();
             Node currentNode = targetNode;
             while(currentNode != startNode)
             {
@@ -70,7 +62,30 @@ namespace C_Sharp_Final_Project.EnemyAI
                 currentNode = currentNode.parent;
             }
             nodePath.Reverse();
+     
+            int directionXNew = 0;
+            int directionYNew = 0;
+            int directionXOld = 0;
+            int directionYOld = 0;
+            List<int> wayPointsXList = new List<int>();
+            List<int> wayPointsYList = new List<int>();
+            for (int i = 1; i < nodePath.Count; i++)
+            {
+                directionXNew = nodePath[i - 1].gridX - nodePath[i].gridX;
+                directionYNew = nodePath[i - 1].gridY - nodePath[i].gridY;
+                if (directionXOld != directionXNew && directionYOld != directionYNew)
+                {
+                    wayPointsXList.Add((int)nodePath[i].worldX);
+                    wayPointsYList.Add((int)nodePath[i].worldY);
+                    directionXOld = directionXNew;
+                    directionYOld = directionYNew;
+                }
+            }
+            wayPointsX = wayPointsXList.ToArray();
+            wayPointsY = wayPointsYList.ToArray();
+           
         }
+
         private int NodeDistance(Node nodea, Node nodeb)
         {
             int distX = Math.Abs(nodea.gridX - nodeb.gridX);

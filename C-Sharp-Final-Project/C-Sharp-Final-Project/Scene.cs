@@ -38,8 +38,8 @@ namespace C_Sharp_Final_Project
                     break;
             }
         }
-        //Start drawing: L> widthxheight *MUST INCLUDE IN FILE. Preferably 30x20
-        //Drawing a wall: W> topleftx, toplefty, width, height
+        //Start drawing level: L> widthxheight *MUST INCLUDE IN FILE. Preferably 30x20
+        //Drawing a wall: W> topleftx, toplefty, bottomrightx, bottomrighty
         //x, y, width, height properties are in TILES UNITS not actual PIXEL UNITS
     }
 }

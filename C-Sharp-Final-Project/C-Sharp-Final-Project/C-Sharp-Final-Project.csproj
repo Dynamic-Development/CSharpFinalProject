@@ -45,12 +45,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AI\Heap.cs" />
+    <Compile Include="AI\PathMaster.cs" />
+    <Compile Include="Component.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="AI\Pathfinder.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="Grid.cs" />
+    <Compile Include="AI\Grid.cs" />
     <Compile Include="Scene.cs" />
-    <Compile Include="Node.cs" />
+    <Compile Include="AI\Node.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -59,7 +61,7 @@
     <Compile Include="SDL2-CS\SDL2_image.cs" />
     <Compile Include="SDL2-CS\SDL2_mixer.cs" />
     <Compile Include="SDL2-CS\SDL2_ttf.cs" />
-    <Compile Include="Textures.cs" />
+    <Compile Include="Texture.cs" />
     <Compile Include="Tile.cs" />
   </ItemGroup>
   <ItemGroup>

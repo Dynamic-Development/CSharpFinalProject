@@ -97,11 +97,13 @@ namespace C_Sharp_Final_Project
             {
                 rect.x = (int)(n.worldX - (nodeWidth / 2));
                 rect.y = (int)(n.worldY - (nodeHeight / 2));
-
-                if (n.walkable)
+                if (n.path)
+                {
+                    SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 0, 0);
+                }
+                else if (n.walkable)
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 0, 0, 0, 0);
-
                 } else
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 255, 255);

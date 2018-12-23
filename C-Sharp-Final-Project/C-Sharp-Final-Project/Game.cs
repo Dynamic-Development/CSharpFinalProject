@@ -36,13 +36,14 @@ namespace C_Sharp_Final_Project
                 isRunning = true;
             }
             PathManager = new PathMaster();
-
+            Player = new Player(235, 210, 56, 36, "Textures/Player.png");
+            //Player always have to be created before enemy.
             enemy = new List<Enemy>
             {
-                new Enemy(300, 100, 32, 32, "Textures/Test2.png"),
+                new Enemy(424, 434, 32, 32, "Textures/Test2.png"),
                 new Enemy(200, 200, 32, 32, "Textures/Test2.png")
             };
-            Player = new Player(400, 200, 56, 36, "Textures/Player.png");
+            
             Scene.SetUpScene("Scenes/level1.txt");
         }
 
@@ -77,10 +78,11 @@ namespace C_Sharp_Final_Project
         public void Update()
         {
             //Update Objects
+            Player.Update();
             for (int e = 0; e < enemy.Count; e++)
                 enemy[e].Update();
-            Player.Update();
-            PathManager.TryProcessNext(Component.CoolDown(ref PathManager.nextPathCoolDown, 20));
+            
+            PathManager.TryProcessNext(Component.CoolDown(ref PathManager.nextPathCoolDown, 3));
         }
 
         public void Render()
@@ -89,14 +91,13 @@ namespace C_Sharp_Final_Project
             SDL_RenderClear(Renderer);
 
             //Render Objects
-
+            
+            //Grid.RenderNodes();
             Player.Render();
             for (int e = 0; e < enemy.Count; e++)
                 enemy[e].Render();
             for (int i = 0; i < Walls.Count; i++)
                 Walls[i].Render();
-            
-            //Grid.RenderNodes();
 
             SDL_RenderPresent(Renderer);
         }

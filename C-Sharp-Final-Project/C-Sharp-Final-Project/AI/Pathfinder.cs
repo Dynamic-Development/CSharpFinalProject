@@ -15,13 +15,22 @@ namespace C_Sharp_Final_Project
             Node startNode = Game.Grid.NodeFromWorld(xPos, yPos);
             Node targetNode = Game.Grid.NodeFromWorld(targetXPos, targetYPos);
             
-            Heap<Node> openSet = new Heap<Node>(Game.Grid.numNodeHeight * Game.Grid.numNodeWidth);
+            List<Node> openSet = new List<Node>();
             HashSet<Node> closedSet = new HashSet<Node>();
             openSet.Add(startNode);
 
             while (openSet.Count > 0)
-            {
-                Node currentNode = openSet.RemoveFirst();       
+            { 
+                Node currentNode = openSet[0];
+                for (int i = 1; i < openSet.Count; i++)
+                {
+                    if (openSet[i].fCost < currentNode.fCost || openSet[i].fCost == currentNode.fCost)
+                    {
+                        if (openSet[i].hCost < currentNode.hCost)
+                            currentNode = openSet[i];
+                    }
+                }
+                openSet.Remove(currentNode);
                 closedSet.Add(currentNode);
 
                 if (currentNode == targetNode)
@@ -41,9 +50,7 @@ namespace C_Sharp_Final_Project
                         neighbor.hCost = NodeDistance(neighbor, targetNode);
                         neighbor.parent = currentNode;
                         if (!openSet.Contains(neighbor))
-                            openSet.Add(neighbor);
-                        else
-                           openSet.UpdateItem(neighbor);                      
+                            openSet.Add(neighbor);                     
                     }
                 }
             }
@@ -58,6 +65,7 @@ namespace C_Sharp_Final_Project
             Node currentNode = targetNode;
             while(currentNode != startNode)
             {
+                currentNode.path = true;
                 nodePath.Add(currentNode);
                 currentNode = currentNode.parent;
             }
@@ -74,28 +82,6 @@ namespace C_Sharp_Final_Project
             wayPointsX = wayPointsXList.ToArray();
             wayPointsY = wayPointsYList.ToArray();
 
-            /*
-            int directionXNew = 0;
-            int directionYNew = 0;
-            int directionXOld = 0;
-            int directionYOld = 0;
-            List<int> wayPointsXList = new List<int>();
-            List<int> wayPointsYList = new List<int>();
-            for (int i = 1; i < nodePath.Count; i++)
-            {
-                directionXNew = nodePath[i - 1].gridX - nodePath[i].gridX;
-                directionYNew = nodePath[i - 1].gridY - nodePath[i].gridY;
-                if (directionXOld != directionXNew && directionYOld != directionYNew)
-                {
-                    wayPointsXList.Add((int)nodePath[i].worldX);
-                    wayPointsYList.Add((int)nodePath[i].worldY);
-                    directionXOld = directionXNew;
-                    directionYOld = directionYNew;
-                }
-            }
-            wayPointsX = wayPointsXList.ToArray();
-            wayPointsY = wayPointsYList.ToArray();
-           */
         }
 
         private int NodeDistance(Node nodea, Node nodeb)

@@ -44,7 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AI\Heap.cs" />
     <Compile Include="AI\PathMaster.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="Enemy.cs" />

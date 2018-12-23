@@ -15,11 +15,13 @@ namespace C_Sharp_Final_Project
         private SDL_Rect dest;
         private IntPtr objTexture;   
 
-        private int findPathCoolDown;
+        private int searchPlayerCoolDown;
         private int[] xPath, yPath;
         private int currentTargetX, currentTargetY;
         private int targetI;
         private bool pathPending;
+        private int oldPlayerX;
+        private int oldPlayerY;
 
         public Enemy(int xPos, int yPos, int width, int height, string texture)
         {
@@ -30,26 +32,34 @@ namespace C_Sharp_Final_Project
             xVel = 0;
             yVel = 0;
  
-            findPathCoolDown = 0;
+            searchPlayerCoolDown = 0;
             pathPending = false;
+            oldPlayerX = Game.Player.xpos;
+            oldPlayerY = Game.Player.ypos;
 
-            //TODO: Set objTexture to *Texture.LoadTexture*
             dest.w = width;
             dest.h = height;
         }
 
         public void Update()
         {
-
-            if (!pathPending && Component.CoolDown(ref findPathCoolDown, 120))
+            if (Component.CoolDown(ref searchPlayerCoolDown, 20))
             {
-                Game.PathManager.RequestPath((int)xPos, (int)yPos, Game.Player.xpos, Game.Player.ypos, OnPathFound);
-                pathPending = true;
+                if (oldPlayerX != Game.Player.xpos || oldPlayerY != Game.Player.ypos)
+                {
+                    oldPlayerY = Game.Player.ypos;
+                    oldPlayerX = Game.Player.xpos;
+                    if (!pathPending)
+                    {
+                        Game.PathManager.RequestPath((int)xPos, (int)yPos, Game.Player.xpos, Game.Player.ypos, OnPathFound);
+                        pathPending = true;
+                    }
+                }
             }
+            
         
             if (xPath != null && yPath != null /*&& distanceToPlayer > SHOOTING_RANGE /*&& sawPlayer*/)
-            {
-                
+            {         
                 if (targetI < xPath.Length - 1 && currentTargetY == (int) Math.Round(yPos, MidpointRounding.AwayFromZero) && 
                                                   currentTargetX == (int) Math.Round(xPos, MidpointRounding.AwayFromZero))
                 {

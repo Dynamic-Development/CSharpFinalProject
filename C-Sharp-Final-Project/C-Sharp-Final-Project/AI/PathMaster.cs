@@ -24,7 +24,6 @@ namespace C_Sharp_Final_Project
         {
             PathRequest newRequest = new PathRequest(pathStartX, pathStartY, pathEndX, pathEndY, callback);
             instance.pathRequests.Enqueue(newRequest);
-            // to delete
         }
 
         public void TryProcessNext(bool processNow)

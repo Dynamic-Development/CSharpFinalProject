@@ -41,13 +41,13 @@ namespace C_Sharp_Final_Project
         public void Update()
         {
 
-            if (!pathPending && Component.CoolDown(ref findPathCoolDown, 500))
+            if (!pathPending && Component.CoolDown(ref findPathCoolDown, 120))
             {
                 Game.PathManager.RequestPath((int)xPos, (int)yPos, Game.Player.xpos, Game.Player.ypos, OnPathFound);
                 pathPending = true;
             }
         
-            if (xPath != null && yPath != null/*&& distanceToPlayer > SHOOTING_RANGE /*&& sawPlayer*/)
+            if (xPath != null && yPath != null /*&& distanceToPlayer > SHOOTING_RANGE /*&& sawPlayer*/)
             {
                 
                 if (targetI < xPath.Length - 1 && currentTargetY == (int) Math.Round(yPos, MidpointRounding.AwayFromZero) && 
@@ -79,12 +79,7 @@ namespace C_Sharp_Final_Project
                 {
                     xPath = xPositions;
                     yPath = yPositions;
-                    for (int i = 0; i < xPath.Length; i++)
-                    {
-                        Console.WriteLine("xpos: " + xPath[i] + "; ypos: " + yPath[i]);
-                    }
-                    Console.WriteLine("---------------------------------------------------------------------------");
-
+                  
                     currentTargetX = xPath[0];
                     currentTargetY = yPath[0];
                     VelocityInDirection(currentTargetX, currentTargetY);

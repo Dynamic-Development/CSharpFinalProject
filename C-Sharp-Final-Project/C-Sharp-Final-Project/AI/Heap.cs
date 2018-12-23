@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace C_Sharp_Final_Project.AI
+namespace C_Sharp_Final_Project
 {
     class Heap<T> where T : IHeapItem<T>
     {
@@ -98,7 +98,7 @@ namespace C_Sharp_Final_Project.AI
             itemB.HeapIndex = itemAIndex;
         }
     }
-    interface IHeapItem<T> : IComparable<T>
+    public interface IHeapItem<T> : IComparable<T>
     {
         int HeapIndex
         {

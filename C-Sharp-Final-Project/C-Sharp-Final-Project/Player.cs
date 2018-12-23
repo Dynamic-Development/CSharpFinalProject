@@ -19,7 +19,7 @@ namespace C_Sharp_Final_Project
 
             xvel = 0;
             yvel = 0;
-            texture = Textures.LoadTexture(texturePath);
+            texture = Texture.LoadTexture(texturePath);
 
             dest.w = width;
             dest.h = height;

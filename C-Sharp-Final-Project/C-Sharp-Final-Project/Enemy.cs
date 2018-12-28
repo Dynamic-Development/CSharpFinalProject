@@ -45,7 +45,7 @@ namespace C_Sharp_Final_Project
             } else // continue on
             {
                 //finding new path
-                if (Component.CoolDown(ref searchPlayerCoolDown, 20))
+                if (Component.CoolDown(ref searchPlayerCoolDown, 5))
                 {
                     if (oldPlayerPosition.X != Game.Player.xpos ||
                         oldPlayerPosition.Y != Game.Player.ypos)
@@ -109,9 +109,14 @@ namespace C_Sharp_Final_Project
                     newPosition += velocity;
                     break;
                 }
+                if (incrementSpeed == currentDistance)
+                {
+                    newPosition = path[targetIndex].worldPosition;
+                    targetIndex++;
+                    break;
+                }
+
             }
-
-
             return newPosition;
         }
 

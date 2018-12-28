@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Collections.Generic;
 using static SDL2.SDL;
 
@@ -13,14 +14,13 @@ namespace C_Sharp_Final_Project
         public static Grid Grid;
         public static int Width;
         public static int Height;
-        public static Player Player;
         public static PathMaster PathManager;
-
-        private List<Enemy> enemy; // make into array soon
 
         public static bool[] KeyStates = new bool[4];
         public static List<Tile> Walls = new List<Tile>();
-        
+        public static List<Enemy> Enemy;
+        public static Player Player;
+
         public Game(){}
         
         public void Init(string title, int xPos, int yPos, int width, int height)
@@ -36,12 +36,12 @@ namespace C_Sharp_Final_Project
                 isRunning = true;
             }
             PathManager = new PathMaster();
-            Player = new Player(235, 210, 56, 36, "Textures/Player.png");
-            //Player always have to be created before enemy.
-            enemy = new List<Enemy>
+            Player = new Player(400, 210, 56, 36, "Textures/Player.png");
+
+            Enemy = new List<Enemy>
             {
-                new Enemy(424, 434, 32, 32, "Textures/Test2.png"),
-                new Enemy(200, 200, 32, 32, "Textures/Test2.png")
+                new Enemy(new Vector(560, 434), 32, 32, "Textures/Test2.png"),
+                new Enemy(new Vector(200, 200), 32, 32, "Textures/Test2.png")
             };
             
             Scene.SetUpScene("Scenes/level1.txt");
@@ -79,27 +79,29 @@ namespace C_Sharp_Final_Project
         {
             //Update Objects
             Player.Update();
-            for (int e = 0; e < enemy.Count; e++)
-                enemy[e].Update();
+            for (int e = 0; e < Enemy.Count; e++)
+                Enemy[e].Update();
             
-            PathManager.TryProcessNext(Component.CoolDown(ref PathManager.nextPathCoolDown, 3));
+            PathManager.TryProcessNext(Component.CoolDown(ref PathManager.nextPathCoolDown, 1));
         }
 
         public void Render()
         {
+
             SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
             SDL_RenderClear(Renderer);
-
-            //Render Objects
             
-            //Grid.RenderNodes();
+            //Render Objects
+           // Grid.RenderNodes();
             Player.Render();
-            for (int e = 0; e < enemy.Count; e++)
-                enemy[e].Render();
+            for (int e = 0; e < Enemy.Count; e++)
+                Enemy[e].Render();
             for (int i = 0; i < Walls.Count; i++)
                 Walls[i].Render();
 
             SDL_RenderPresent(Renderer);
+
+            
         }
 
         public void Clean()

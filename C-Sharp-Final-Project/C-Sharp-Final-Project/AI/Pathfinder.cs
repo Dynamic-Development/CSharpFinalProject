@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace C_Sharp_Final_Project
 {
     class Pathfinder
     {
-        int[] wayPointsX;
-        int[] wayPointsY;
+        List<Node> nodePath;
 
-        public void FindPath(int xPos, int yPos, int targetXPos, int targetYPos)
+        public void FindPath(Vector start, Vector target)
         {
             bool success = false;
 
-            Node startNode = Game.Grid.NodeFromWorld(xPos, yPos);
-            Node targetNode = Game.Grid.NodeFromWorld(targetXPos, targetYPos);
+            Node startNode = Game.Grid.NodeFromWorld(start);
+            Node targetNode = Game.Grid.NodeFromWorld(target);
             
             List<Node> openSet = new List<Node>();
             HashSet<Node> closedSet = new HashSet<Node>();
@@ -56,42 +56,34 @@ namespace C_Sharp_Final_Project
             }
             if (success)
                 RetracePath(startNode, targetNode);
-            Game.PathManager.FinishedrocessingPath(wayPointsX, wayPointsY, success);
+            Game.PathManager.FinishedrocessingPath(nodePath, success);
         }
 
         private void RetracePath(Node startNode, Node targetNode)
-        { 
-            List<Node> nodePath = new List<Node>();
+        {
+            foreach (Node node in Game.Grid.worldNodes)
+                node.path = false;
+
+            nodePath = new List<Node>();
             Node currentNode = targetNode;
             while(currentNode != startNode)
             {
-                currentNode.path = true;
                 nodePath.Add(currentNode);
                 currentNode = currentNode.parent;
             }
 
             nodePath.Reverse();
 
-            List<int> wayPointsXList = new List<int>();
-            List<int> wayPointsYList = new List<int>();
-            for (int i = 1; i < nodePath.Count; i++)
-            {
-                wayPointsXList.Add((int)nodePath[i].worldX);
-                wayPointsYList.Add((int)nodePath[i].worldY);
-            }
-            wayPointsX = wayPointsXList.ToArray();
-            wayPointsY = wayPointsYList.ToArray();
-
+            foreach (Node node in nodePath)
+                node.path = true;
         }
 
         private int NodeDistance(Node nodea, Node nodeb)
         {
-            int distX = Math.Abs(nodea.gridX - nodeb.gridX);
-            int distY = Math.Abs(nodea.gridY - nodeb.gridY);
+            Vector dist = new Vector(Math.Abs(nodea.gridPosition.X - nodeb.gridPosition.X),
+                                     Math.Abs(nodea.gridPosition.Y - nodeb.gridPosition.Y));
 
-            if (distX > distY)
-                return 14 * distY + 10 * (distX - distY);
-            return 14 * distX + 10 * (distY - distX);
-        } 
+            return dist.X > dist.Y ? (int) (14 * dist.Y + 10 * (dist.X - dist.Y)) : (int) (14 * dist.X + 10 * (dist.Y - dist.X));
+        }
     }
 }

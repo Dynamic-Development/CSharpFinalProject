@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Collections.Generic;
 using static SDL2.SDL;
 
@@ -7,35 +8,30 @@ namespace C_Sharp_Final_Project
     class Enemy
     {
         private const int SPEED = 1; //May subject to change
-        private const int SHOOTING_RANGE = 30;
-      
-        public double xPos, yPos;
+        private const int SHOOTING_RANGE = 0;
 
-        private double xVel, yVel;
+        public Vector position;
+        public Vector velocity;
+        private Vector direction;
+
         private SDL_Rect dest;
         private IntPtr objTexture;   
 
         private int searchPlayerCoolDown;
-        private int[] xPath, yPath;
-        private int currentTargetX, currentTargetY;
-        private int targetI;
+        private List<Node> path;
+        private int currentTargetIndex;
         private bool pathPending;
-        private int oldPlayerX;
-        private int oldPlayerY;
+        private Vector oldPlayerPosition;
 
-        public Enemy(int xPos, int yPos, int width, int height, string texture)
+        public Enemy(Vector position, int width, int height, string texture)
         {
             objTexture = Texture.LoadTexture(texture);
 
-            this.xPos = xPos;
-            this.yPos = yPos;
-            xVel = 0;
-            yVel = 0;
- 
+            this.position = position;
+            velocity = new Vector(0, 0);
+
             searchPlayerCoolDown = 0;
             pathPending = false;
-            oldPlayerX = Game.Player.xpos;
-            oldPlayerY = Game.Player.ypos;
 
             dest.w = width;
             dest.h = height;
@@ -43,75 +39,87 @@ namespace C_Sharp_Final_Project
 
         public void Update()
         {
-            if (Component.CoolDown(ref searchPlayerCoolDown, 20))
+            if (Component.DistanceOfPoints(Game.Player.xpos, Game.Player.ypos, position.X, position.Y) < SHOOTING_RANGE)
             {
-                if (oldPlayerX != Game.Player.xpos || oldPlayerY != Game.Player.ypos)
+                // && (*castRayToPlayer == true) fire bullets to player 
+            } else // continue on
+            {
+                //finding new path
+                if (Component.CoolDown(ref searchPlayerCoolDown, 20))
                 {
-                    oldPlayerY = Game.Player.ypos;
-                    oldPlayerX = Game.Player.xpos;
-                    if (!pathPending)
+                    if (oldPlayerPosition.X != Game.Player.xpos ||
+                        oldPlayerPosition.Y != Game.Player.ypos)
                     {
-                        Game.PathManager.RequestPath((int)xPos, (int)yPos, Game.Player.xpos, Game.Player.ypos, OnPathFound);
-                        pathPending = true;
+                        oldPlayerPosition.Y = Game.Player.ypos;
+                        oldPlayerPosition.X = Game.Player.xpos;
+                        if (!pathPending)
+                        {
+                            Game.PathManager.RequestPath(position, oldPlayerPosition, OnPathFound);
+                            pathPending = true;
+                        }
                     }
                 }
-            }
-            
-        
-            if (xPath != null && yPath != null /*&& distanceToPlayer > SHOOTING_RANGE /*&& sawPlayer*/)
-            {         
-                if (targetI < xPath.Length - 1 && currentTargetY == (int) Math.Round(yPos, MidpointRounding.AwayFromZero) && 
-                                                  currentTargetX == (int) Math.Round(xPos, MidpointRounding.AwayFromZero))
-                {
-                    targetI++;
-                    currentTargetX = xPath[targetI];
-                    currentTargetY = yPath[targetI];
-                    VelocityInDirection(currentTargetX, currentTargetY);
-                }
 
-                if (!(xPath[xPath.Length - 1] == (int) Math.Round(xPos, MidpointRounding.AwayFromZero) &&
-                      yPath[yPath.Length - 1] == (int) Math.Round(yPos, MidpointRounding.AwayFromZero)))
+                //moving
+                if (path != null)
                 {
-                    xPos += xVel;
-                    yPos += yVel;
-                }
+                    if (currentTargetIndex < path.Count - 1)
+                    {
+                        position = PinPointPosition(ref currentTargetIndex);
+                    }
+                } 
             }
-
-            dest.x = (int) xPos - dest.w / 2;
-            dest.y = (int) yPos - dest.h / 2;
         }
 
-        private void OnPathFound(int[] xPositions, int[] yPositions, bool found)
+        private void OnPathFound(List<Node> foundPath, bool found)
         {
-            if (found)
+            if (found && foundPath.Count != 0)
             {
-                if (xPositions.Length != 0 && yPositions.Length != 0)
-                {
-                    xPath = xPositions;
-                    yPath = yPositions;
-                  
-                    currentTargetX = xPath[0];
-                    currentTargetY = yPath[0];
-                    VelocityInDirection(currentTargetX, currentTargetY);
-
-                    targetI = 0;
-                }
-                pathPending = false;                
+                path = foundPath;
+                currentTargetIndex = 1;
             }
+            pathPending = false;   
         }
 
-        private void VelocityInDirection(int gotoX, int gotoY)
+        private Vector PinPointPosition(ref int targetIndex)
         {
-            double distance = Math.Sqrt(((gotoX - xPos) * (gotoX - xPos)) + ((gotoY-yPos) * (gotoY-yPos)));
-            double directionX = (gotoX - xPos) / distance;
-            double directionY = (gotoY - yPos) / distance;
+            Vector newPosition = position;
+            Vector newDirection = direction;
+            double incrementSpeed = SPEED;
+            double currentDistance;
 
-            xVel = directionX * SPEED;
-            yVel = directionY * SPEED;
+            while (targetIndex < path.Count - 1)
+            {
+                currentDistance = Component.DistanceOfPoints(newPosition.X, newPosition.Y,
+                                                             path[targetIndex].worldPosition.X,
+                                                             path[targetIndex].worldPosition.Y);
+                if (incrementSpeed > currentDistance)
+                {
+                    incrementSpeed = incrementSpeed - currentDistance;
+                    newPosition = path[targetIndex].worldPosition;
+                    targetIndex++;
+                    currentDistance = Component.DistanceOfPoints(newPosition.X, newPosition.Y,
+                                                             path[targetIndex].worldPosition.X,
+                                                             path[targetIndex].worldPosition.Y);
+                }
+                if (incrementSpeed < currentDistance)
+                {
+                    direction = (path[targetIndex].worldPosition - newPosition) / currentDistance;
+                    velocity = direction * incrementSpeed;
+                    newPosition += velocity;
+                    break;
+                }
+            }
+
+
+            return newPosition;
         }
 
+        
         public void Render()
         {
+            dest.x = (int)Math.Round(position.X - (dest.w / 2), MidpointRounding.AwayFromZero);
+            dest.y = (int)Math.Round(position.Y - (dest.h / 2), MidpointRounding.AwayFromZero);
             SDL_RenderCopy(Game.Renderer, objTexture, IntPtr.Zero, ref dest);
         }
     }

@@ -36,16 +36,19 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AI\Heap.cs" />
-    <Compile Include="AI\PathMaster.cs" />
+    <Compile Include="AI\Pathmaster.cs" />
+    <Compile Include="AI\Raycaster.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="AI\Pathfinder.cs" />

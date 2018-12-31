@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace C_Sharp_Final_Project
 {
     class Pathfinder
     {
-        int[] wayPointsX;
-        int[] wayPointsY;
+        List<Node> nodePath;
 
-        public void FindPath(int xPos, int yPos, int targetXPos, int targetYPos)
+        public void FindPath(Vector start, Vector target, double distFromTarget)
         {
             bool success = false;
 
-            Node startNode = Game.Grid.NodeFromWorld(xPos, yPos);
-            Node targetNode = Game.Grid.NodeFromWorld(targetXPos, targetYPos);
-            
+            Node startNode = Game.Grid.NodeFromWorld(start);
+            Node targetNode = Game.Grid.NodeFromWorld(target);
+
             Heap<Node> openSet = new Heap<Node>(Game.Grid.numNodeHeight * Game.Grid.numNodeWidth);
             HashSet<Node> closedSet = new HashSet<Node>();
             openSet.Add(startNode);
 
             while (openSet.Count > 0)
             {
-                Node currentNode = openSet.RemoveFirst();       
+                Node currentNode = openSet.RemoveFirst();
                 closedSet.Add(currentNode);
 
                 if (currentNode == targetNode)
@@ -30,9 +30,9 @@ namespace C_Sharp_Final_Project
                     break;
                 }
 
-                foreach(Node neighbor in Game.Grid.NodeNeighbors(currentNode))
+                foreach (Node neighbor in Game.Grid.PossibleNodeNeighbors(currentNode, 1))
                 {
-                    if (!neighbor.walkable || closedSet.Contains(neighbor))
+                    if (closedSet.Contains(neighbor) || neighbor.endPoint)
                         continue;
                     int moveCost = currentNode.gCost + NodeDistance(currentNode, neighbor);
                     if (moveCost < neighbor.gCost || !openSet.Contains(neighbor))
@@ -43,18 +43,31 @@ namespace C_Sharp_Final_Project
                         if (!openSet.Contains(neighbor))
                             openSet.Add(neighbor);
                         else
-                           openSet.UpdateItem(neighbor);                      
+                            openSet.UpdateItem(neighbor);
                     }
                 }
             }
             if (success)
-                RetracePath(startNode, targetNode);
-            Game.PathManager.FinishedrocessingPath(wayPointsX, wayPointsY, success);
+                RetracePath(startNode, targetNode, distFromTarget);
+            Game.Pathmanager.FinishedrocessingPath(nodePath, success);
         }
 
-        private void RetracePath(Node startNode, Node targetNode)
-        { 
-            List<Node> nodePath = new List<Node>();
+        public void PathDistAndView (ref List<Node> path, double distFromTarget)
+        {
+            for(int i = 0; i < path.Count; i++)
+            {
+                if (Component.DistanceOfPoints(path[i].worldPosition, path[path.Count - 1].worldPosition) <= distFromTarget &&
+                    !Raycaster.IsWallsBlockView(path[i].worldPosition, path[path.Count - 1].worldPosition, Game.Walls))
+                {
+                    path.RemoveRange(i + 1, path.Count - 1 - i);
+                    break;
+                }
+            }
+        }
+
+        private void RetracePath(Node startNode, Node targetNode, double distFromTarget)
+        {
+            nodePath = new List<Node>();
             Node currentNode = targetNode;
             while(currentNode != startNode)
             {
@@ -64,48 +77,18 @@ namespace C_Sharp_Final_Project
 
             nodePath.Reverse();
 
-            List<int> wayPointsXList = new List<int>();
-            List<int> wayPointsYList = new List<int>();
-            for (int i = 1; i < nodePath.Count; i++)
-            {
-                wayPointsXList.Add((int)nodePath[i].worldX);
-                wayPointsYList.Add((int)nodePath[i].worldY);
-            }
-            wayPointsX = wayPointsXList.ToArray();
-            wayPointsY = wayPointsYList.ToArray();
+            PathDistAndView(ref nodePath, distFromTarget);
 
-            /*
-            int directionXNew = 0;
-            int directionYNew = 0;
-            int directionXOld = 0;
-            int directionYOld = 0;
-            List<int> wayPointsXList = new List<int>();
-            List<int> wayPointsYList = new List<int>();
-            for (int i = 1; i < nodePath.Count; i++)
-            {
-                directionXNew = nodePath[i - 1].gridX - nodePath[i].gridX;
-                directionYNew = nodePath[i - 1].gridY - nodePath[i].gridY;
-                if (directionXOld != directionXNew && directionYOld != directionYNew)
-                {
-                    wayPointsXList.Add((int)nodePath[i].worldX);
-                    wayPointsYList.Add((int)nodePath[i].worldY);
-                    directionXOld = directionXNew;
-                    directionYOld = directionYNew;
-                }
-            }
-            wayPointsX = wayPointsXList.ToArray();
-            wayPointsY = wayPointsYList.ToArray();
-           */
+            foreach (Node node in nodePath)
+                node.path = true;
         }
 
         private int NodeDistance(Node nodea, Node nodeb)
         {
-            int distX = Math.Abs(nodea.gridX - nodeb.gridX);
-            int distY = Math.Abs(nodea.gridY - nodeb.gridY);
+            Vector dist = new Vector(Math.Abs(nodea.gridPosition.X - nodeb.gridPosition.X),
+                                     Math.Abs(nodea.gridPosition.Y - nodeb.gridPosition.Y));
 
-            if (distX > distY)
-                return 14 * distY + 10 * (distX - distY);
-            return 14 * distX + 10 * (distY - distX);
-        } 
+            return dist.X > dist.Y ? (int) (14 * dist.Y + 10 * (dist.X - dist.Y)) : (int) (14 * dist.X + 10 * (dist.Y - dist.X));
+        }
     }
 }

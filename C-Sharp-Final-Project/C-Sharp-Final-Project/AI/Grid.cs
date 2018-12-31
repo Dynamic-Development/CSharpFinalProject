@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using static SDL2.SDL;
 
 namespace C_Sharp_Final_Project
@@ -22,21 +23,25 @@ namespace C_Sharp_Final_Project
         {
             numNodeWidth = numTileWidth * NODES_PER_TILE;
             numNodeHeight = numTileHeight * NODES_PER_TILE;
+
             nodeWidth = worldWidth / numNodeWidth;
             nodeHeight = worldHeight / numNodeHeight;
+
             halfNodeHeight = nodeHeight / 2;
             halfNodeWidth = nodeWidth / 2;
+
             worldNodes = new Node[numNodeWidth, numNodeHeight];
+
             tileHeight = worldHeight / numTileHeight;
             tileWidth = worldWidth / numTileWidth;
 
-            double nodex, nodey;
+            Vector nodePosition = new Vector(0, 0);
             for (int x = 0; x < numNodeWidth; x++) { 
-                nodex = halfNodeWidth + (nodeWidth * x);
+                nodePosition.X = halfNodeWidth + (nodeWidth * x);
                 for (int y = 0; y < numNodeHeight; y++)
                 {
-                    nodey = halfNodeHeight + (nodeHeight * y);
-                    worldNodes[x, y] = new Node(nodex, nodey, x, y, true);
+                    nodePosition.Y = halfNodeHeight + (nodeHeight * y);
+                    worldNodes[x, y] = new Node(nodePosition, new Vector(x, y), true);
                 }
             }
 
@@ -44,34 +49,36 @@ namespace C_Sharp_Final_Project
             rect.h = (int)nodeHeight;
 
         }
-        public List<Node> NodeNeighbors(Node node)
+        public List<Node> PossibleNodeNeighbors(Node node, int depth)
         {
             List<Node> neighbors = new List<Node>();
 
-            int gridX, gridY;
-            for (int x = -1; x <= 1; x++)
-                for (int y = -1; y <= 1; y++)
+            Vector grid = new Vector(0, 0);
+            for (int x = -depth; x <= depth; x++)
+            {
+                for (int y = -depth; y <= depth; y++)
                 {
                     if (x == 0 && y == 0)
                         continue;
 
-                    gridX = node.gridX + x;
-                    gridY = node.gridY + y;
-                   
-                    if ((gridX >= 0) && (gridX < numNodeWidth) &&
-                        (gridY >= 0) && (gridY < numNodeHeight))
+                    grid.X = node.gridPosition.X + x;
+                    grid.Y = node.gridPosition.Y + y;
+
+                    if ((grid.X >= 0) && (grid.X < numNodeWidth) &&
+                        (grid.Y >= 0) && (grid.Y < numNodeHeight) &&
+                        worldNodes[(int)grid.X, (int)grid.Y].walkable)
                     {
-                        neighbors.Add(worldNodes[gridX, gridY]);
+                        neighbors.Add(worldNodes[(int)grid.X, (int)grid.Y]);
                     }
                 }
-
+            }
             return neighbors;
         }
 
-        public Node NodeFromWorld(int worldX, int worldY)
+        public Node NodeFromWorld(Vector worldPosition)
         {
-            int xi = (int) Math.Round((worldX - halfNodeWidth) / nodeWidth, MidpointRounding.AwayFromZero);
-            int yi = (int) Math.Round((worldY - halfNodeHeight) / nodeHeight, MidpointRounding.AwayFromZero);
+            int xi = (int) Math.Round((worldPosition.X - halfNodeWidth) / nodeWidth, MidpointRounding.AwayFromZero);
+            int yi = (int) Math.Round((worldPosition.Y - halfNodeHeight) / nodeHeight, MidpointRounding.AwayFromZero);
 
             return worldNodes[xi, yi];
         }
@@ -93,22 +100,27 @@ namespace C_Sharp_Final_Project
 
         public void RenderNodes()
         {
-            foreach(Node n in worldNodes)
+            foreach(Node node in worldNodes)
             {
-                rect.x = (int)(n.worldX - (nodeWidth / 2));
-                rect.y = (int)(n.worldY - (nodeHeight / 2));
+                rect.x = (int)(node.worldPosition.X - (nodeWidth / 2));
+                rect.y = (int)(node.worldPosition.Y - (nodeHeight / 2));
 
-                if (n.walkable)
+                if (node.endPoint)
+                {
+                    SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
+                }
+                else if (node.path) {
+                    SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 0, 0);
+                }
+                else if (node.walkable)
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 0, 0, 0, 0);
-
                 } else
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 255, 255);
                 }
-                SDL_RenderFillRect(Game.Renderer, ref rect);
+                SDL_RenderFillRect(Game.Renderer, ref rect); //testing
             }
-
         }
     }
 }

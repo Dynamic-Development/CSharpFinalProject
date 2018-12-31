@@ -1,28 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Windows;
 
 namespace C_Sharp_Final_Project
 {
-    class PathMaster
+    class Pathmaster
     {
         Queue<PathRequest> pathRequests = new Queue<PathRequest>();
         PathRequest currentPathRequest;
-        static PathMaster instance;
+        static Pathmaster instance;
         Pathfinder pathfinding;
         public int nextPathCoolDown = 0;
 
         bool isProcessingPath;
 
-        public PathMaster()
+        public Pathmaster()
         {
             instance = this;
             pathfinding = new Pathfinder();
         }
 
-        public void RequestPath(int pathStartX, int pathStartY, int pathEndX, int pathEndY, Action<int[], int[], bool> callback)
+        public void RequestPath(Vector pathStart, Vector pathEnd, double distFromTarget, Action<List<Node>, bool> callback)
         {
-            PathRequest newRequest = new PathRequest(pathStartX, pathStartY, pathEndX, pathEndY, callback);
+            PathRequest newRequest = new PathRequest(pathStart, pathEnd, distFromTarget, callback);
             instance.pathRequests.Enqueue(newRequest);
         }
 
@@ -32,29 +32,27 @@ namespace C_Sharp_Final_Project
             {
                 currentPathRequest = pathRequests.Dequeue();
                 isProcessingPath = true;
-                pathfinding.FindPath(currentPathRequest.pathStartX, currentPathRequest.pathStartY,
-                                       currentPathRequest.pathEndX, currentPathRequest.pathEndY);
+                pathfinding.FindPath(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.distFromTarget);
             }
         }
 
-        public void FinishedrocessingPath(int[] pathX, int[] pathY, bool success)
+        public void FinishedrocessingPath(List<Node> nodePath, bool success)
         {
-            currentPathRequest.callback(pathX, pathY, success);
+            currentPathRequest.callback(nodePath, success);
             isProcessingPath = false;
-         // to delete
         }
 
         struct PathRequest
         {
-            public int pathStartX, pathStartY;
-            public int pathEndX, pathEndY;
-            public Action<int[], int[], bool> callback;
-            public PathRequest(int startX, int startY, int endX, int endY, Action<int[], int[], bool> callback)
+            public Vector pathStart;
+            public Vector pathEnd;
+            public double distFromTarget;
+            public Action<List<Node>, bool> callback;
+            public PathRequest(Vector start, Vector end, double dist, Action<List<Node> , bool> callback)
             {
-                pathEndX = endX;
-                pathEndY = endY;
-                pathStartX = startX;
-                pathStartY = startY;
+                pathStart = start;
+                pathEnd = end;
+                distFromTarget = dist;
                 this.callback = callback;
             }
         }

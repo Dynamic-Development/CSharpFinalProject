@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Collections.Generic;
 using static SDL2.SDL;
 
@@ -13,14 +14,13 @@ namespace C_Sharp_Final_Project
         public static Grid Grid;
         public static int Width;
         public static int Height;
-        public static Player Player;
-        public static PathMaster PathManager;
-
-        private List<Enemy> enemy; // make into array soon
+        public static Pathmaster Pathmanager;
 
         public static bool[] KeyStates = new bool[4];
         public static List<Tile> Walls = new List<Tile>();
-        
+        public static List<Enemy> Enemy;
+        public static Player Player;
+
         public Game(){}
         
         public void Init(string title, int xPos, int yPos, int width, int height)
@@ -28,6 +28,7 @@ namespace C_Sharp_Final_Project
             SDL_WindowFlags flags = 0;
             Width = width;
             Height = height;
+
             if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
             {
                 window = SDL_CreateWindow(title, xPos, yPos, width, height, flags);
@@ -35,14 +36,17 @@ namespace C_Sharp_Final_Project
                 SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
                 isRunning = true;
             }
-            PathManager = new PathMaster();
 
-            enemy = new List<Enemy>
+            Pathmanager = new Pathmaster();
+
+            Player = new Player(200, 300, 56, 36, "Textures/Player.png");
+
+            Enemy = new List<Enemy>
             {
-                new Enemy(300, 100, 32, 32, "Textures/Test2.png"),
-                new Enemy(200, 200, 32, 32, "Textures/Test2.png")
+                new Enemy(new Vector(200, 100), 32, 32, "Textures/Test2.png"),
+                new Enemy(new Vector(200, 500), 32, 32, "Textures/Test2.png")
             };
-            Player = new Player(400, 200, 56, 36, "Textures/Player.png");
+            
             Scene.SetUpScene("Scenes/level1.txt");
         }
 
@@ -70,6 +74,10 @@ namespace C_Sharp_Final_Project
                         case SDL_Keycode.SDLK_d: KeyStates[3] = false; break;
                     }
                     break;
+                case SDL_EventType.SDL_MOUSEBUTTONDOWN:
+                    Console.WriteLine("Player pos: {0}, {1}", Player.xpos, Player.ypos);
+                    Console.WriteLine("Enemy pos: {0}", Enemy[0].position);
+                    break;
                 default: isRunning = true; break;
             }
         }
@@ -77,28 +85,30 @@ namespace C_Sharp_Final_Project
         public void Update()
         {
             //Update Objects
-            for (int e = 0; e < enemy.Count; e++)
-                enemy[e].Update();
             Player.Update();
-            PathManager.TryProcessNext(Component.CoolDown(ref PathManager.nextPathCoolDown, 20));
+            for (int e = 0; e < Enemy.Count; e++)
+                Enemy[e].Update();
+            
+            Pathmanager.TryProcessNext(Component.CoolDown(ref Pathmanager.nextPathCoolDown, 3));
         }
 
         public void Render()
         {
+
             SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
             SDL_RenderClear(Renderer);
-
+            
             //Render Objects
-
+            Grid.RenderNodes();
             Player.Render();
-            for (int e = 0; e < enemy.Count; e++)
-                enemy[e].Render();
+            for (int e = 0; e < Enemy.Count; e++)
+                Enemy[e].Render();
             for (int i = 0; i < Walls.Count; i++)
                 Walls[i].Render();
-            
-            //Grid.RenderNodes();
 
             SDL_RenderPresent(Renderer);
+
+            
         }
 
         public void Clean()

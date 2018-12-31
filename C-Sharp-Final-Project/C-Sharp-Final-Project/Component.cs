@@ -23,11 +23,10 @@ namespace C_Sharp_Final_Project
         {
             return Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         }
-
-        /*
+        
         public static double DistanceOfPoints(Vector a, Vector b)
         {
             return Math.Sqrt(((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y)));
-        }*/
+        }
     }
 }

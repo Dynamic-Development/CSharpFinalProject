@@ -23,11 +23,15 @@ namespace C_Sharp_Final_Project
         {
             numNodeWidth = numTileWidth * NODES_PER_TILE;
             numNodeHeight = numTileHeight * NODES_PER_TILE;
+
             nodeWidth = worldWidth / numNodeWidth;
             nodeHeight = worldHeight / numNodeHeight;
+
             halfNodeHeight = nodeHeight / 2;
             halfNodeWidth = nodeWidth / 2;
+
             worldNodes = new Node[numNodeWidth, numNodeHeight];
+
             tileHeight = worldHeight / numTileHeight;
             tileWidth = worldWidth / numTileWidth;
 
@@ -45,27 +49,29 @@ namespace C_Sharp_Final_Project
             rect.h = (int)nodeHeight;
 
         }
-        public List<Node> NodeNeighbors(Node node)
+        public List<Node> PossibleNodeNeighbors(Node node, int depth)
         {
             List<Node> neighbors = new List<Node>();
 
             Vector grid = new Vector(0, 0);
-            for (int x = -1; x <= 1; x++)
-                for (int y = -1; y <= 1; y++)
+            for (int x = -depth; x <= depth; x++)
+            {
+                for (int y = -depth; y <= depth; y++)
                 {
                     if (x == 0 && y == 0)
                         continue;
 
                     grid.X = node.gridPosition.X + x;
                     grid.Y = node.gridPosition.Y + y;
-                   
+
                     if ((grid.X >= 0) && (grid.X < numNodeWidth) &&
-                        (grid.Y >= 0) && (grid.Y < numNodeHeight))
+                        (grid.Y >= 0) && (grid.Y < numNodeHeight) &&
+                        worldNodes[(int)grid.X, (int)grid.Y].walkable)
                     {
-                        neighbors.Add(worldNodes[(int) grid.X, (int) grid.Y]);
+                        neighbors.Add(worldNodes[(int)grid.X, (int)grid.Y]);
                     }
                 }
-
+            }
             return neighbors;
         }
 
@@ -98,7 +104,12 @@ namespace C_Sharp_Final_Project
             {
                 rect.x = (int)(node.worldPosition.X - (nodeWidth / 2));
                 rect.y = (int)(node.worldPosition.Y - (nodeHeight / 2));
-                if (node.path) {
+
+                if (node.endPoint)
+                {
+                    SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
+                }
+                else if (node.path) {
                     SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 0, 0);
                 }
                 else if (node.walkable)
@@ -108,10 +119,8 @@ namespace C_Sharp_Final_Project
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 255, 255);
                 }
-                SDL_RenderFillRect(Game.Renderer, ref rect);
+                SDL_RenderFillRect(Game.Renderer, ref rect); //testing
             }
-            
-
         }
     }
 }

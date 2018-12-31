@@ -8,7 +8,7 @@ namespace C_Sharp_Final_Project
     class Enemy
     {
         private const int SPEED = 1; //May subject to change
-        private const int SHOOTING_RANGE = 0;
+        private const int SHOOTING_RANGE = 90;
 
         public Vector position;
         public Vector velocity;
@@ -21,7 +21,7 @@ namespace C_Sharp_Final_Project
         private List<Node> path;
         private int currentTargetIndex;
         private bool pathPending;
-        private Vector oldPlayerPosition;
+        private Vector targetPosition;
 
         public Enemy(Vector position, int width, int height, string texture)
         {
@@ -38,37 +38,44 @@ namespace C_Sharp_Final_Project
         }
 
         public void Update()
-        {
-            if (Component.DistanceOfPoints(Game.Player.xpos, Game.Player.ypos, position.X, position.Y) < SHOOTING_RANGE)
+        { 
+            //finding new path
+            if (Component.CoolDown(ref searchPlayerCoolDown, 5))
             {
-                // && (*castRayToPlayer == true) fire bullets to player 
-            } else // continue on
-            {
-                //finding new path
-                if (Component.CoolDown(ref searchPlayerCoolDown, 5))
+                if (targetPosition.X != Game.Player.xpos ||
+                    targetPosition.Y != Game.Player.ypos)
                 {
-                    if (oldPlayerPosition.X != Game.Player.xpos ||
-                        oldPlayerPosition.Y != Game.Player.ypos)
+                    targetPosition.Y = Game.Player.ypos;
+                    targetPosition.X = Game.Player.xpos;
+                    if (!pathPending)
                     {
-                        oldPlayerPosition.Y = Game.Player.ypos;
-                        oldPlayerPosition.X = Game.Player.xpos;
-                        if (!pathPending)
+                        if (path != null)
                         {
-                            Game.PathManager.RequestPath(position, oldPlayerPosition, OnPathFound);
-                            pathPending = true;
-                        }
+                            foreach (Node node in path)
+                                node.path = false;
+                        }// testing 
+                        if (path != null)
+                            foreach (Node endNode in Game.Grid.PossibleNodeNeighbors(path[path.Count - 1], 2))
+                                endNode.endPoint = false;
+
+                        Game.Pathmanager.RequestPath(position, targetPosition, SHOOTING_RANGE, OnPathFound);
+                        pathPending = true;
                     }
                 }
-
-                //moving
-                if (path != null)
-                {
-                    if (currentTargetIndex < path.Count - 1)
-                    {
-                        position = PinPointPosition(ref currentTargetIndex);
-                    }
-                } 
             }
+
+            //moving
+            if (path != null)
+            {
+                if (currentTargetIndex < path.Count)
+                {
+                    position = PinPointPosition(ref currentTargetIndex);
+                } else
+                {
+                    //shoot bullets
+                }
+            } 
+            
         }
 
         private void OnPathFound(List<Node> foundPath, bool found)
@@ -76,6 +83,10 @@ namespace C_Sharp_Final_Project
             if (found && foundPath.Count != 0)
             {
                 path = foundPath;
+
+                foreach (Node endNode in Game.Grid.PossibleNodeNeighbors(path[path.Count - 1], 2))
+                    endNode.endPoint = true;
+
                 currentTargetIndex = 1;
             }
             pathPending = false;   
@@ -88,7 +99,7 @@ namespace C_Sharp_Final_Project
             double incrementSpeed = SPEED;
             double currentDistance;
 
-            while (targetIndex < path.Count - 1)
+            while (targetIndex < path.Count)
             {
                 currentDistance = Component.DistanceOfPoints(newPosition.X, newPosition.Y,
                                                              path[targetIndex].worldPosition.X,
@@ -97,10 +108,18 @@ namespace C_Sharp_Final_Project
                 {
                     incrementSpeed = incrementSpeed - currentDistance;
                     newPosition = path[targetIndex].worldPosition;
-                    targetIndex++;
-                    currentDistance = Component.DistanceOfPoints(newPosition.X, newPosition.Y,
-                                                             path[targetIndex].worldPosition.X,
-                                                             path[targetIndex].worldPosition.Y);
+                    if (targetIndex + 1 == path.Count)
+                    {
+                        newPosition = path[targetIndex].worldPosition;
+                        break;
+                    }
+                    else
+                    {
+                        targetIndex++;
+                        currentDistance = Component.DistanceOfPoints(newPosition.X, newPosition.Y,
+                                                                 path[targetIndex].worldPosition.X,
+                                                                 path[targetIndex].worldPosition.Y);
+                    }
                 }
                 if (incrementSpeed < currentDistance)
                 {

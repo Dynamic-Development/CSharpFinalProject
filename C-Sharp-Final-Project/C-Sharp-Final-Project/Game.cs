@@ -14,7 +14,7 @@ namespace C_Sharp_Final_Project
         public static Grid Grid;
         public static int Width;
         public static int Height;
-        public static PathMaster PathManager;
+        public static Pathmaster Pathmanager;
 
         public static bool[] KeyStates = new bool[4];
         public static List<Tile> Walls = new List<Tile>();
@@ -28,6 +28,7 @@ namespace C_Sharp_Final_Project
             SDL_WindowFlags flags = 0;
             Width = width;
             Height = height;
+
             if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
             {
                 window = SDL_CreateWindow(title, xPos, yPos, width, height, flags);
@@ -35,13 +36,15 @@ namespace C_Sharp_Final_Project
                 SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
                 isRunning = true;
             }
-            PathManager = new PathMaster();
-            Player = new Player(400, 210, 56, 36, "Textures/Player.png");
+
+            Pathmanager = new Pathmaster();
+
+            Player = new Player(200, 300, 56, 36, "Textures/Player.png");
 
             Enemy = new List<Enemy>
             {
-                new Enemy(new Vector(560, 434), 32, 32, "Textures/Test2.png"),
-                new Enemy(new Vector(200, 200), 32, 32, "Textures/Test2.png")
+                new Enemy(new Vector(200, 100), 32, 32, "Textures/Test2.png"),
+                new Enemy(new Vector(200, 500), 32, 32, "Textures/Test2.png")
             };
             
             Scene.SetUpScene("Scenes/level1.txt");
@@ -71,6 +74,10 @@ namespace C_Sharp_Final_Project
                         case SDL_Keycode.SDLK_d: KeyStates[3] = false; break;
                     }
                     break;
+                case SDL_EventType.SDL_MOUSEBUTTONDOWN:
+                    Console.WriteLine("Player pos: {0}, {1}", Player.xpos, Player.ypos);
+                    Console.WriteLine("Enemy pos: {0}", Enemy[0].position);
+                    break;
                 default: isRunning = true; break;
             }
         }
@@ -82,7 +89,7 @@ namespace C_Sharp_Final_Project
             for (int e = 0; e < Enemy.Count; e++)
                 Enemy[e].Update();
             
-            PathManager.TryProcessNext(Component.CoolDown(ref PathManager.nextPathCoolDown, 1));
+            Pathmanager.TryProcessNext(Component.CoolDown(ref Pathmanager.nextPathCoolDown, 3));
         }
 
         public void Render()
@@ -92,7 +99,7 @@ namespace C_Sharp_Final_Project
             SDL_RenderClear(Renderer);
             
             //Render Objects
-           // Grid.RenderNodes();
+            Grid.RenderNodes();
             Player.Render();
             for (int e = 0; e < Enemy.Count; e++)
                 Enemy[e].Render();

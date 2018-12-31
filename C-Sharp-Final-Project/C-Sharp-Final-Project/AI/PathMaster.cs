@@ -4,25 +4,25 @@ using System.Windows;
 
 namespace C_Sharp_Final_Project
 {
-    class PathMaster
+    class Pathmaster
     {
         Queue<PathRequest> pathRequests = new Queue<PathRequest>();
         PathRequest currentPathRequest;
-        static PathMaster instance;
+        static Pathmaster instance;
         Pathfinder pathfinding;
         public int nextPathCoolDown = 0;
 
         bool isProcessingPath;
 
-        public PathMaster()
+        public Pathmaster()
         {
             instance = this;
             pathfinding = new Pathfinder();
         }
 
-        public void RequestPath(Vector pathStart, Vector pathEnd, Action<List<Node>, bool> callback)
+        public void RequestPath(Vector pathStart, Vector pathEnd, double distFromTarget, Action<List<Node>, bool> callback)
         {
-            PathRequest newRequest = new PathRequest(pathStart, pathEnd, callback);
+            PathRequest newRequest = new PathRequest(pathStart, pathEnd, distFromTarget, callback);
             instance.pathRequests.Enqueue(newRequest);
         }
 
@@ -32,7 +32,7 @@ namespace C_Sharp_Final_Project
             {
                 currentPathRequest = pathRequests.Dequeue();
                 isProcessingPath = true;
-                pathfinding.FindPath(currentPathRequest.pathStart, currentPathRequest.pathEnd);
+                pathfinding.FindPath(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.distFromTarget);
             }
         }
 
@@ -46,11 +46,13 @@ namespace C_Sharp_Final_Project
         {
             public Vector pathStart;
             public Vector pathEnd;
+            public double distFromTarget;
             public Action<List<Node>, bool> callback;
-            public PathRequest(Vector start, Vector end, Action<List<Node> , bool> callback)
+            public PathRequest(Vector start, Vector end, double dist, Action<List<Node> , bool> callback)
             {
                 pathStart = start;
                 pathEnd = end;
+                distFromTarget = dist;
                 this.callback = callback;
             }
         }

@@ -9,18 +9,21 @@ namespace C_Sharp_Final_Project
         public bool walkable;
         public int gCost, hCost;
         public Node parent;
-        public bool path = false;
+        public bool endPoint;
+
+        public bool path = false; //testing
 
         public Node(Vector worldPosition, Vector gridPosition, bool walkable)
         {
             this.worldPosition = worldPosition;
             this.gridPosition = gridPosition;
             this.walkable = walkable;
-
+            
             gCost = 0;
             hCost = 0;
 
             parent = null;
+            endPoint = false;
         }
         public int fCost {
             get

@@ -83,19 +83,23 @@ namespace C_Sharp_Final_Project
             return worldNodes[xi, yi];
         }
 
-        public Node[] GroupNodesTileArea(int fromXTile, int fromYTile, int toXTile, int toYTile)
+        public List<Node> TileNodes(int fromXTile, int fromYTile, int toXTile, int toYTile)
         {
             int widthTiles = toXTile - fromXTile;
-            int heightTiles = toYTile - fromXTile;
-            Node[] nodeInTileArea = new Node[(heightTiles) * (widthTiles) * NODES_PER_TILE * NODES_PER_TILE];
+            int heightTiles = toYTile - fromYTile;
+            List<Node> nodeInTileVolume = new List<Node>();
             int fromXNode = fromXTile * NODES_PER_TILE;
             int fromYNode = fromYTile * NODES_PER_TILE;
-            int tempIndex = 0;
-            for (int x = fromXNode; x < ((widthTiles) * NODES_PER_TILE + fromXNode); x++)
-                for (int y = fromYNode; y < ((heightTiles) * NODES_PER_TILE + fromYNode); y++) {
-                    nodeInTileArea[tempIndex++] = worldNodes[x, y];
+            
+            for (int x = fromXNode; x < ((widthTiles + 1) * NODES_PER_TILE + fromXNode); x++)
+            {
+                for (int y = fromYNode; y < ((heightTiles + 1) * NODES_PER_TILE + fromYNode); y++)
+                {
+                    nodeInTileVolume.Add(worldNodes[x, y]);
                 }
-            return nodeInTileArea;
+            }
+            
+            return nodeInTileVolume;
         }
 
         public void RenderNodes()
@@ -108,6 +112,9 @@ namespace C_Sharp_Final_Project
                 if (node.endPoint)
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
+                } else if (node.reserved)
+                {
+                    SDL_SetRenderDrawColor(Game.Renderer, 90, 25, 90, 0);
                 }
                 else if (node.path) {
                     SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 0, 0);

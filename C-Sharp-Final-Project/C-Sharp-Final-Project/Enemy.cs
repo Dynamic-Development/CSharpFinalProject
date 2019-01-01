@@ -40,7 +40,7 @@ namespace C_Sharp_Final_Project
         public void Update()
         { 
             //finding new path
-            if (Component.CoolDown(ref searchPlayerCoolDown, 5))
+            if (Component.CoolDown(ref searchPlayerCoolDown, 20))
             {
                 if (targetPosition.X != Game.Player.xpos ||
                     targetPosition.Y != Game.Player.ypos)
@@ -55,9 +55,18 @@ namespace C_Sharp_Final_Project
                                 node.path = false;
                         }// testing 
                         if (path != null)
+                        {
+                            path[path.Count - 1].endPoint = false;
                             foreach (Node endNode in Game.Grid.PossibleNodeNeighbors(path[path.Count - 1], 2))
                                 endNode.endPoint = false;
 
+                            foreach (Node node in path)
+                            {
+                                node.reserved = false;
+                                foreach (Node reserved in Game.Grid.PossibleNodeNeighbors(node, 2))
+                                    reserved.reserved = false;
+                            }
+                        }
                         Game.Pathmanager.RequestPath(position, targetPosition, SHOOTING_RANGE, OnPathFound);
                         pathPending = true;
                     }
@@ -69,7 +78,7 @@ namespace C_Sharp_Final_Project
             {
                 if (currentTargetIndex < path.Count)
                 {
-                    position = PinPointPosition(ref currentTargetIndex);
+                    position = LocateNextPosition(ref currentTargetIndex);
                 } else
                 {
                     //shoot bullets
@@ -83,14 +92,29 @@ namespace C_Sharp_Final_Project
             if (found && foundPath.Count != 0)
             {
                 path = foundPath;
+
+                path[path.Count - 1].endPoint = true;
                 foreach (Node endNode in Game.Grid.PossibleNodeNeighbors(path[path.Count - 1], 2))
                     endNode.endPoint = true;
+
+                foreach (Node node in path)
+                {
+                    node.reserved = true;
+                    foreach (Node reserved in Game.Grid.PossibleNodeNeighbors(node, 2))
+                        reserved.reserved = true;
+                }
                 currentTargetIndex = 1;
+            }
+            else
+            {
+                path[path.Count - 1].endPoint = true;
+                foreach (Node endNode in Game.Grid.PossibleNodeNeighbors(path[path.Count - 1], 2))
+                    endNode.endPoint = true;
             }
             pathPending = false;   
         }
 
-        private Vector PinPointPosition(ref int targetIndex)
+        private Vector LocateNextPosition(ref int targetIndex)
         {
             Vector newPosition = position;
             Vector newDirection = direction;
@@ -106,9 +130,14 @@ namespace C_Sharp_Final_Project
                 {
                     incrementSpeed = incrementSpeed - currentDistance;
                     newPosition = path[targetIndex].worldPosition;
+                    if (targetIndex - 1 >= 0)
+                    {
+                        path[targetIndex - 1].reserved = false;
+                        foreach (Node reserved in Game.Grid.PossibleNodeNeighbors(path[targetIndex - 1], 2))
+                            reserved.reserved = false;
+                    }
                     if (targetIndex + 1 == path.Count)
                     {
-                        newPosition = path[targetIndex].worldPosition;
                         break;
                     }
                     else
@@ -128,6 +157,12 @@ namespace C_Sharp_Final_Project
                 }
                 if (incrementSpeed == currentDistance)
                 {
+                    if (targetIndex - 1 >= 0)
+                    {
+                        path[targetIndex - 1].reserved = false;
+                        foreach (Node reserved in Game.Grid.PossibleNodeNeighbors(path[targetIndex - 1], 2))
+                            reserved.reserved = false;
+                    }
                     newPosition = path[targetIndex].worldPosition;
                     targetIndex++;
                     break;

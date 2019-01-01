@@ -10,6 +10,7 @@ namespace C_Sharp_Final_Project
         public int gCost, hCost;
         public Node parent;
         public bool endPoint;
+        public bool reserved;
 
         public bool path = false; //testing
 
@@ -24,6 +25,7 @@ namespace C_Sharp_Final_Project
 
             parent = null;
             endPoint = false;
+            reserved = false;
         }
         public int fCost {
             get

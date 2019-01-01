@@ -28,7 +28,7 @@ namespace C_Sharp_Final_Project
                     line = line.Substring(2);
                     tempIndexes = line.Split(',').Select(x => int.Parse(x)).ToArray();
                     Game.Walls.Add(new Tile(tempIndexes[0], tempIndexes[1], tempIndexes[2], tempIndexes[3], false));
-                    Node[] unwalkableNodes = Game.Grid.GroupNodesTileArea(tempIndexes[0], tempIndexes[1], tempIndexes[2], tempIndexes[3]);
+                    List<Node> unwalkableNodes = Game.Grid.TileNodes(tempIndexes[0], tempIndexes[1], tempIndexes[2], tempIndexes[3]);
                
                     foreach (Node node in unwalkableNodes)
                         node.walkable = false;

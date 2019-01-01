@@ -35,18 +35,18 @@ namespace C_Sharp_Final_Project
                 foreach (Node neighbor in Game.Grid.PossibleNodeNeighbors(currentNode, 1))
                 {
                     
-                    if (closedSet.Contains(neighbor) || neighbor.endPoint)
+                    if (closedSet.Contains(neighbor) || neighbor.endPoint || neighbor.reserved)
                         continue;
                     else
                     {
-                        bool subNeighborEndPoint = false;
+                        bool neighborNodeUnavailable = false;
                         foreach (Node subNeighbor in Game.Grid.PossibleNodeNeighbors(currentNode, 2))
-                            if (subNeighbor.endPoint)
+                            if (subNeighbor.endPoint || subNeighbor.reserved)
                             {
-                                subNeighborEndPoint = true;
+                                neighborNodeUnavailable = true;
                                 break;
                             }
-                        if (subNeighborEndPoint)
+                        if (neighborNodeUnavailable)
                             continue;
                     }
                     

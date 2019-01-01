@@ -83,10 +83,8 @@ namespace C_Sharp_Final_Project
             if (found && foundPath.Count != 0)
             {
                 path = foundPath;
-
                 foreach (Node endNode in Game.Grid.PossibleNodeNeighbors(path[path.Count - 1], 2))
                     endNode.endPoint = true;
-
                 currentTargetIndex = 1;
             }
             pathPending = false;   

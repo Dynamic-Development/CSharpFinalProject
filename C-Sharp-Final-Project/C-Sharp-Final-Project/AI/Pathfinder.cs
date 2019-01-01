@@ -24,16 +24,32 @@ namespace C_Sharp_Final_Project
                 Node currentNode = openSet.RemoveFirst();
                 closedSet.Add(currentNode);
 
-                if (currentNode == targetNode)
+                if (Component.DistanceOfPoints(targetNode.worldPosition, currentNode.worldPosition) <= distFromTarget &&
+                    !Raycaster.IsWallsBlockView(currentNode.worldPosition, targetNode.worldPosition, Game.Walls))
                 {
+                    targetNode = currentNode; 
                     success = true;
                     break;
                 }
 
                 foreach (Node neighbor in Game.Grid.PossibleNodeNeighbors(currentNode, 1))
                 {
+                    
                     if (closedSet.Contains(neighbor) || neighbor.endPoint)
                         continue;
+                    else
+                    {
+                        bool subNeighborEndPoint = false;
+                        foreach (Node subNeighbor in Game.Grid.PossibleNodeNeighbors(currentNode, 2))
+                            if (subNeighbor.endPoint)
+                            {
+                                subNeighborEndPoint = true;
+                                break;
+                            }
+                        if (subNeighborEndPoint)
+                            continue;
+                    }
+                    
                     int moveCost = currentNode.gCost + NodeDistance(currentNode, neighbor);
                     if (moveCost < neighbor.gCost || !openSet.Contains(neighbor))
                     {
@@ -51,20 +67,7 @@ namespace C_Sharp_Final_Project
                 RetracePath(startNode, targetNode, distFromTarget);
             Game.Pathmanager.FinishedrocessingPath(nodePath, success);
         }
-
-        public void PathDistAndView (ref List<Node> path, double distFromTarget)
-        {
-            for(int i = 0; i < path.Count; i++)
-            {
-                if (Component.DistanceOfPoints(path[i].worldPosition, path[path.Count - 1].worldPosition) <= distFromTarget &&
-                    !Raycaster.IsWallsBlockView(path[i].worldPosition, path[path.Count - 1].worldPosition, Game.Walls))
-                {
-                    path.RemoveRange(i + 1, path.Count - 1 - i);
-                    break;
-                }
-            }
-        }
-
+        
         private void RetracePath(Node startNode, Node targetNode, double distFromTarget)
         {
             nodePath = new List<Node>();
@@ -76,8 +79,6 @@ namespace C_Sharp_Final_Project
             }
 
             nodePath.Reverse();
-
-            PathDistAndView(ref nodePath, distFromTarget);
 
             foreach (Node node in nodePath)
                 node.path = true;

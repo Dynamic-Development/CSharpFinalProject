@@ -24,10 +24,8 @@ namespace C_Sharp_Final_Project
                 Node currentNode = openSet.RemoveFirst();
                 closedSet.Add(currentNode);
 
-                if (Component.DistanceOfPoints(targetNode.worldPosition, currentNode.worldPosition) <= distFromTarget &&
-                    !Raycaster.IsWallsBlockView(currentNode.worldPosition, targetNode.worldPosition, Game.Walls))
+                if (currentNode == targetNode)
                 {
-                    targetNode = currentNode; 
                     success = true;
                     break;
                 }
@@ -67,7 +65,21 @@ namespace C_Sharp_Final_Project
                 RetracePath(startNode, targetNode, distFromTarget);
             Game.Pathmanager.FinishedrocessingPath(nodePath, success);
         }
-        
+
+        public void EvaluatePath(ref List<Node> path, double distFromTarget)
+        {
+            for (int i = 0; i < path.Count; i++)
+            {
+                if (Component.DistanceOfPoints(path[i].worldPosition, path[path.Count - 1].worldPosition) < distFromTarget &&
+                    !Raycaster.WallsBlockView(path[i].worldPosition, path[path.Count - 1].worldPosition, Game.Walls)
+                    )
+                {
+                    path.RemoveRange(i + 1, path.Count - 1 - i);
+                    break;
+                }
+            }
+        }
+
         private void RetracePath(Node startNode, Node targetNode, double distFromTarget)
         {
             nodePath = new List<Node>();
@@ -79,6 +91,7 @@ namespace C_Sharp_Final_Project
             }
 
             nodePath.Reverse();
+            EvaluatePath(ref nodePath, distFromTarget);
 
             foreach (Node node in nodePath)
                 node.path = true;

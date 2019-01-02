@@ -8,7 +8,7 @@ namespace C_Sharp_Final_Project
     class Enemy
     {
         private const int SPEED = 1; //May subject to change
-        private const int SHOOTING_RANGE = 90;
+        private const int SHOOTING_RANGE = 200;
 
         public Vector position;
         public Vector velocity;
@@ -40,7 +40,7 @@ namespace C_Sharp_Final_Project
         public void Update()
         { 
             //finding new path
-            if (Component.CoolDown(ref searchPlayerCoolDown, 20))
+            if (Component.CoolDown(ref searchPlayerCoolDown, 50))
             {
                 if (targetPosition.X != Game.Player.xpos ||
                     targetPosition.Y != Game.Player.ypos)
@@ -49,26 +49,31 @@ namespace C_Sharp_Final_Project
                     targetPosition.X = Game.Player.xpos;
                     if (!pathPending)
                     {
-                        if (path != null)
+                        if ((Component.DistanceOfPoints(targetPosition, position) > SHOOTING_RANGE ||
+                            Raycaster.WallsBlockView(targetPosition, position, Game.Walls)
+                            ))
                         {
-                            foreach (Node node in path)
-                                node.path = false;
-                        }// testing 
-                        if (path != null)
-                        {
-                            path[path.Count - 1].endPoint = false;
-                            foreach (Node endNode in Game.Grid.PossibleNodeNeighbors(path[path.Count - 1], 2))
-                                endNode.endPoint = false;
-
-                            foreach (Node node in path)
+                            if (path != null)
                             {
-                                node.reserved = false;
-                                foreach (Node reserved in Game.Grid.PossibleNodeNeighbors(node, 2))
-                                    reserved.reserved = false;
+                                foreach (Node node in path)
+                                    node.path = false;
+                            }// testing 
+                            if (path != null)
+                            {
+                                path[path.Count - 1].endPoint = false;
+                                foreach (Node endNode in Game.Grid.PossibleNodeNeighbors(path[path.Count - 1], 2))
+                                    endNode.endPoint = false;
+
+                                foreach (Node node in path)
+                                {
+                                    node.reserved = false;
+                                    foreach (Node reserved in Game.Grid.PossibleNodeNeighbors(node, 2))
+                                        reserved.reserved = false;
+                                }
                             }
+                            Game.Pathmanager.RequestPath(position, targetPosition, SHOOTING_RANGE, OnPathFound);
+                            pathPending = true;
                         }
-                        Game.Pathmanager.RequestPath(position, targetPosition, SHOOTING_RANGE, OnPathFound);
-                        pathPending = true;
                     }
                 }
             }
@@ -103,14 +108,9 @@ namespace C_Sharp_Final_Project
                     foreach (Node reserved in Game.Grid.PossibleNodeNeighbors(node, 2))
                         reserved.reserved = true;
                 }
-                currentTargetIndex = 1;
+                currentTargetIndex = 0;
             }
-            else
-            {
-                path[path.Count - 1].endPoint = true;
-                foreach (Node endNode in Game.Grid.PossibleNodeNeighbors(path[path.Count - 1], 2))
-                    endNode.endPoint = true;
-            }
+           
             pathPending = false;   
         }
 

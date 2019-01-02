@@ -100,7 +100,7 @@ namespace C_Sharp_Final_Project
             
             //Render Objects
             Grid.RenderNodes();
-            Player.Render();
+            //Player.Render();
             for (int e = 0; e < Enemy.Count; e++)
                 Enemy[e].Render();
             for (int i = 0; i < Walls.Count; i++)

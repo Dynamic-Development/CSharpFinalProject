@@ -104,12 +104,17 @@ namespace C_Sharp_Final_Project
 
         public void RenderNodes()
         {
+            Node playerNode = NodeFromWorld(new Vector(Game.Player.xpos, Game.Player.ypos));
+
+
             foreach(Node node in worldNodes)
             {
                 rect.x = (int)(node.worldPosition.X - (nodeWidth / 2));
                 rect.y = (int)(node.worldPosition.Y - (nodeHeight / 2));
-
-                if (node.endPoint)
+                if (node == playerNode) {
+                    SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
+                }
+                else if (node.endPoint)
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
                 } else if (node.reserved)

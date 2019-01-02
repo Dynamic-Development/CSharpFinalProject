@@ -6,7 +6,7 @@ namespace C_Sharp_Final_Project
 {
     class Raycaster
     {
-        public static bool IsWallsBlockView(Vector fromPoint, Vector toPoint, List<Tile> walls)
+        public static bool WallsBlockView(Vector fromPoint, Vector toPoint, List<Tile> walls)
         {
             foreach (Tile wall in walls)
             {
@@ -47,7 +47,7 @@ namespace C_Sharp_Final_Project
             if (rayDist.X * segDist.Y == rayDist.Y * segDist.X)
                 return null;
 
-            double t2 = ((segPoint.Y - rayPoint.Y) * rayDist.X + (rayPoint.X - segPoint.X) * rayDist.Y) / 
+            double t2 = ((segPoint.Y - rayPoint.Y) * rayDist.X + (rayPoint.X - segPoint.X) * rayDist.Y) /
                         (segDist.X * rayDist.Y - segDist.Y * rayDist.X);
 
             if (t2 < 0 || t2 > 1)

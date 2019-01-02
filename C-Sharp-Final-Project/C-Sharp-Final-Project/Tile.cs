@@ -54,6 +54,13 @@ namespace C_Sharp_Final_Project
 
         public void Render()
         {
+            SDL_SetRenderDrawColor(Game.Renderer, 255, 0, 255, 100);
+            for (int j = 0; j < segments.Length; j++)
+            {
+                SDL_RenderDrawLine(Game.Renderer, (int) segments[j][0].X, (int) segments[j][0].Y, 
+                    (int) segments[j][1].X, (int) segments[j][1].Y);
+            }
+           
             for (int i = 0; i < objDests.Length; i++)
             {
                 SDL_RenderCopy(Game.Renderer, objTexture, IntPtr.Zero, ref objDests[i]);

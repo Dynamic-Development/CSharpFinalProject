@@ -9,9 +9,9 @@ namespace C_Sharp_Final_Project
         public bool walkable;
         public int gCost, hCost;
         public Node parent;
-        public bool endPoint;
-        public bool reserved;
 
+		public int rLevel; //-1: not walkable (not implemented); 0: available; 1: reserved; 2: start point; 3: end point
+		
         public bool path = false; //testing
 
         public Node(Vector worldPosition, Vector gridPosition, bool walkable)
@@ -22,10 +22,9 @@ namespace C_Sharp_Final_Project
             
             gCost = 0;
             hCost = 0;
-
+			rLevel = 0;
+			
             parent = null;
-            endPoint = false;
-            reserved = false;
         }
         public int fCost {
             get

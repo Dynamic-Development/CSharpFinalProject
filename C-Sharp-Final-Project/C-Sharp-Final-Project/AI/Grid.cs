@@ -101,7 +101,17 @@ namespace C_Sharp_Final_Project
             
             return nodeInTileVolume;
         }
-
+		
+		public void SetLevelGroupNodes(Node currentNode, int occupationLevel, int neighborDepth)
+		{
+			foreach (Node neighbor in PossibleNodeNeighbors(currentNode, neighborDepth)){
+				if (neighbor.rLevel == currentNode.rLevel) {
+					neighbor.rLevel = occupationLevel;
+				}
+			}				
+			currentNode.rLevel = occupationLevel;
+		}
+		
         public void RenderNodes()
         {
             Node playerNode = NodeFromWorld(new Vector(Game.Player.xpos, Game.Player.ypos));
@@ -114,10 +124,10 @@ namespace C_Sharp_Final_Project
                 if (node == playerNode) {
                     SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
                 }
-                else if (node.endPoint)
+                else if (node.rLevel == 1)
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
-                } else if (node.reserved)
+                } else if (node.rLevel == 3)
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 90, 25, 90, 0);
                 }

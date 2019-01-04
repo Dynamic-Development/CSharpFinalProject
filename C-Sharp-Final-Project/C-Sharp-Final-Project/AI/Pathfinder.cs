@@ -94,7 +94,7 @@ namespace C_Sharp_Final_Project
                 }
             }
 
-            //If a previous node was marked as endpoint, it probably means that this path is wrong. Highly unlikely but a safe catch.
+            //If a previous node was marked as endpoint, cut off. Unlikely safe catch.
             for (int j = 0; j < nodePath.Count - 2; j++)
             {
                 if (nodePath[j].rLevel == 3)

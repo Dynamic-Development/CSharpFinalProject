@@ -46,8 +46,6 @@ namespace C_Sharp_Final_Project
                 new Enemy(new Vector(200, 100), 32, 32, "Textures/Test2.png"),
                 new Enemy(new Vector(200, 500), 32, 32, "Textures/Test2.png")
             };
-            
-            
         }
 
         public void HandleEvents()
@@ -97,7 +95,7 @@ namespace C_Sharp_Final_Project
 
             SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
             SDL_RenderClear(Renderer);
-            
+
             //Render Objects
             Grid.RenderNodes();
             //Player.Render();
@@ -107,8 +105,6 @@ namespace C_Sharp_Final_Project
                 Walls[i].Render();
 
             SDL_RenderPresent(Renderer);
-
-            
         }
 
         public void Clean()

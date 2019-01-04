@@ -8,7 +8,7 @@ namespace C_Sharp_Final_Project
     class Enemy
     {
         private const int SPEED = 1; //May subject to change
-        private const int SHOOTING_RANGE = 200;
+        private const int SHOOTING_RANGE = 145;
 
         public Vector position;
         public Vector velocity;
@@ -23,8 +23,10 @@ namespace C_Sharp_Final_Project
         private bool pathPending;
         private Vector targetPosition;
 
-		private int radiusInNodes = 2;
+		private const int RADIUS_IN_NODES = 2;
 		
+        //if player goes near enemy, player die
+
         public Enemy(Vector position, int width, int height, string texture)
         {
             objTexture = Texture.LoadTexture(texture);
@@ -35,7 +37,7 @@ namespace C_Sharp_Final_Project
             searchPlayerCoolDown = 0;
             pathPending = false;
 			
-			Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 2, radiusInNodes);
+			Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 2, RADIUS_IN_NODES);
 			
             dest.w = width;
             dest.h = height;
@@ -61,9 +63,18 @@ namespace C_Sharp_Final_Project
                     }// testing 
                     if (path != null)
                     {
-                        foreach (Node node in path)
+                        if (currentTargetIndex == path.Count)
                         {
-                            Game.Grid.SetLevelGroupNodes(node, 0, radiusInNodes);
+                            foreach (Node node in path)
+                            {
+                                Game.Grid.SetLevelGroupNodes(node, 0, RADIUS_IN_NODES, 1);
+                            }
+                        } else
+                        {
+                            foreach (Node node in path)
+                            {
+                                Game.Grid.SetLevelGroupNodes(node, 0, RADIUS_IN_NODES);
+                            }
                         }
                     }
                     Game.Pathmanager.RequestPath(position, targetPosition, SHOOTING_RANGE, OnPathFound);
@@ -79,7 +90,7 @@ namespace C_Sharp_Final_Project
                 {
                     if (currentTargetIndex - 1 >= 0)
                     {
-                        Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, radiusInNodes, 1);
+                        Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, RADIUS_IN_NODES, 1);
                     }
                     //shoot bullets
                 }
@@ -96,9 +107,9 @@ namespace C_Sharp_Final_Project
                 for (int i = 0; i < path.Count; i++)
                 {
                     if (i == path.Count - 1)
-                        Game.Grid.SetLevelGroupNodes(path[i], 3, radiusInNodes);
+                        Game.Grid.SetLevelGroupNodes(path[i], 3, RADIUS_IN_NODES);
                     else
-                        Game.Grid.SetLevelGroupNodes(path[i], 1, radiusInNodes);
+                        Game.Grid.SetLevelGroupNodes(path[i], 1, RADIUS_IN_NODES);
                 }
                 currentTargetIndex = 0;
             }
@@ -122,7 +133,7 @@ namespace C_Sharp_Final_Project
                     newPosition = path[currentTargetIndex].worldPosition;
                     if (currentTargetIndex - 1 >= 0)
                     {
-                        Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, radiusInNodes, 1);
+                        Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, RADIUS_IN_NODES, 1);
                     }
                     if (currentTargetIndex + 1 == path.Count)
                     {
@@ -145,7 +156,7 @@ namespace C_Sharp_Final_Project
                 {
                     if (currentTargetIndex - 1 >= 0)
                     {
-                        Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, radiusInNodes, 1);
+                        Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, RADIUS_IN_NODES, 1);
                     }
                     newPosition = path[currentTargetIndex].worldPosition;
                     currentTargetIndex++;

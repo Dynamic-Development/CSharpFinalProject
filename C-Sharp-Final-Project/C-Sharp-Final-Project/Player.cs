@@ -1,22 +1,20 @@
 ﻿using System;
+using System.Windows;
 using static SDL2.SDL;
 
 namespace C_Sharp_Final_Project
 {
     class Player
     {
-        public int xpos;
-        public int ypos;
+        public Vector position;
         private IntPtr texture;
         private SDL_Rect dest;
         
         public int xvel;
         public int yvel;
-        public Player(int posx , int posy, int width, int height, string texturePath)
+        public Player(Vector position, int width, int height, string texturePath)
         {
-            xpos = posx;
-            ypos = posy;
-
+            this.position = position;
             xvel = 0;
             yvel = 0;
             texture = Texture.LoadTexture(texturePath);
@@ -32,13 +30,13 @@ namespace C_Sharp_Final_Project
             if (Game.KeyStates[2]) yvel++;
             if (Game.KeyStates[3]) xvel++;
 
-            xpos = xpos + (xvel * 5);
-            ypos = ypos + (yvel * 5);
+            position.X = position.X + (xvel * 5);
+            position.Y = position.Y + (yvel * 5);
             xvel = 0;
             yvel = 0;
 
-            dest.x = xpos - dest.w / 2;
-            dest.y = ypos - dest.h / 2;
+            dest.x = (int) position.X - dest.w / 2;
+            dest.y = (int) position.Y - dest.h / 2;
         }
         public void Render()
         {

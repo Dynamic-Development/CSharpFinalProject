@@ -24,7 +24,8 @@ namespace C_Sharp_Final_Project
         private Vector targetPosition;
 
 		private const int RADIUS_IN_NODES = 2;
-		
+        private int radius;
+
         //if player goes near enemy, player die
 
         public Enemy(Vector position, int width, int height, string texture)
@@ -38,7 +39,7 @@ namespace C_Sharp_Final_Project
             pathPending = false;
 			
 			Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 2, RADIUS_IN_NODES);
-			
+            radius = width / 2;
             dest.w = width;
             dest.h = height;
         }
@@ -47,13 +48,11 @@ namespace C_Sharp_Final_Project
         { 
             //finding new path
             if (Component.CoolDown(ref searchPlayerCoolDown, 50) &&
-               (targetPosition.X != Game.Player.xpos ||
-                targetPosition.Y != Game.Player.ypos))
+               (targetPosition != Game.Player.position))
             {
-                targetPosition.Y = Game.Player.ypos;
-                targetPosition.X = Game.Player.xpos;
+                targetPosition = Game.Player.position;
                 if (!pathPending && 
-                    (Component.DistanceOfPoints(targetPosition, position) > SHOOTING_RANGE ||
+                    (!Component.DistanceOfPointsLessThan(targetPosition, position, SHOOTING_RANGE) ||
                     Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls)))
                 {
                     if (path != null)
@@ -65,9 +64,9 @@ namespace C_Sharp_Final_Project
                     {
                         if (currentTargetIndex == path.Count)
                         {
-                            foreach (Node node in path)
+                            for(int i = currentTargetIndex; i < path.Count; i++) 
                             {
-                                Game.Grid.SetLevelGroupNodes(node, 0, RADIUS_IN_NODES, 1);
+                                Game.Grid.SetLevelGroupNodes(path[i], 0, RADIUS_IN_NODES, 1);
                             }
                         } else
                         {
@@ -83,9 +82,18 @@ namespace C_Sharp_Final_Project
                 
             } else if (path != null)
             {
+               // if (Component.DistanceOfPointsLessThan(targetPosition, position, SHOOTING_RANGE) && Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls))
                 if (currentTargetIndex < path.Count)
                 {
-                    position = LocateNextPosition();
+                    bool nearAnotherEnemy = false;
+                    foreach (Enemy e in Game.Enemy) {
+                        if (e != this)
+                            nearAnotherEnemy = Component.DistanceOfPointsLessThan(position, e.position, radius * 2);
+                        if (nearAnotherEnemy)
+                            break;
+                    }
+                    if (!nearAnotherEnemy)
+                        position = LocateNextPosition();
                 } else
                 {
                     if (currentTargetIndex - 1 >= 0)
@@ -112,6 +120,9 @@ namespace C_Sharp_Final_Project
                         Game.Grid.SetLevelGroupNodes(path[i], 1, RADIUS_IN_NODES);
                 }
                 currentTargetIndex = 0;
+            } else
+            {
+                Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 3, RADIUS_IN_NODES);
             }
            
             pathPending = false;   

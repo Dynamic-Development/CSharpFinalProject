@@ -36,13 +36,15 @@ namespace C_Sharp_Final_Project
                     foreach (Node neighbor in Game.Grid.PossibleNodeNeighbors(currentNode, 1))
                     {
 
-                        if (closedSet.Contains(neighbor) || neighbor.rLevel != 0 || !neighbor.walkable)
+                        if (closedSet.Contains(neighbor) || neighbor.rLevel != 0 || 
+                            !neighbor.walkable || neighbor.rLevel == 3 || neighbor.rLevel == 1)
                             continue;
                         else
                         {
                             bool neighborNodeUnavailable = false;
                             foreach (Node subNeighbor in Game.Grid.PossibleNodeNeighbors(currentNode, 2))
-                                if (subNeighbor.rLevel != 0 || !subNeighbor.walkable)
+                                if (subNeighbor.rLevel != 0 || !subNeighbor.walkable || 
+                                    neighbor.rLevel == 3 || neighbor.rLevel == 1)
                                 {
                                     neighborNodeUnavailable = true;
                                     break;
@@ -85,7 +87,7 @@ namespace C_Sharp_Final_Project
 			//Evaluate path and cutting off range.
             for (int i = 0; i < nodePath.Count; i++)
             {
-                if (Component.DistanceOfPoints(nodePath[i].worldPosition, nodePath[nodePath.Count - 1].worldPosition) < distFromTarget &&
+                if (Component.DistanceOfPointsLessThan(nodePath[i].worldPosition, nodePath[nodePath.Count - 1].worldPosition, distFromTarget) &&
                     !Raycaster.AreWallsBlockView(nodePath[i].worldPosition, nodePath[nodePath.Count - 1].worldPosition, Game.Walls)
                     )
                 {
@@ -95,6 +97,7 @@ namespace C_Sharp_Final_Project
             }
 
             //If a previous node was marked as endpoint, cut off. Unlikely safe catch.
+            /*
             for (int j = 0; j < nodePath.Count - 2; j++)
             {
                 if (nodePath[j].rLevel == 3)
@@ -103,7 +106,7 @@ namespace C_Sharp_Final_Project
                     break;
                 }
             }
-
+            */
             foreach (Node node in nodePath)
                 node.path = true; // testing
         }

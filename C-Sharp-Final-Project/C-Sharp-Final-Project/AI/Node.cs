@@ -10,7 +10,7 @@ namespace C_Sharp_Final_Project
         public int gCost, hCost;
         public Node parent;
 
-		public int rLevel; //-1: not walkable (not implemented); 0: available; 1: reserved; 2: start point; 3: end point
+		public int rLevel; // 0: available; 1: reserved; 2: start point; 3: end point
 		
         public bool path = false; //testing
 

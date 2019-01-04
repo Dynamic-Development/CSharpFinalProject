@@ -77,13 +77,20 @@ namespace C_Sharp_Final_Project
 
         public Node NodeFromWorld(Vector worldPosition)
         {
-            int xi = (int) Math.Round((worldPosition.X - halfNodeWidth) / nodeWidth, MidpointRounding.AwayFromZero);
-            int yi = (int) Math.Round((worldPosition.Y - halfNodeHeight) / nodeHeight, MidpointRounding.AwayFromZero);
+            try
+            {
+                int xi = (int)Math.Round((worldPosition.X - halfNodeWidth) / nodeWidth, MidpointRounding.AwayFromZero);
+                int yi = (int)Math.Round((worldPosition.Y - halfNodeHeight) / nodeHeight, MidpointRounding.AwayFromZero);
 
-            return worldNodes[xi, yi];
+                return worldNodes[xi, yi];
+            }
+            catch (IndexOutOfRangeException)
+            {
+                return null;
+            }
         }
 
-        public List<Node> TileNodes(int fromXTile, int fromYTile, int toXTile, int toYTile)
+        public List<Node> TileNodes(int fromXTile, int fromYTile, int toXTile, int toYTile, int overlay)
         {
             int widthTiles = toXTile - fromXTile;
             int heightTiles = toYTile - fromYTile;
@@ -91,11 +98,15 @@ namespace C_Sharp_Final_Project
             int fromXNode = fromXTile * NODES_PER_TILE;
             int fromYNode = fromYTile * NODES_PER_TILE;
             
-            for (int x = fromXNode; x < ((widthTiles + 1) * NODES_PER_TILE + fromXNode); x++)
+            for (int x = fromXNode - overlay; x < ((widthTiles + 1) * NODES_PER_TILE + fromXNode + overlay); x++)
             {
-                for (int y = fromYNode; y < ((heightTiles + 1) * NODES_PER_TILE + fromYNode); y++)
+                for (int y = fromYNode - overlay; y < ((heightTiles + 1) * NODES_PER_TILE + fromYNode + overlay); y++)
                 {
-                    nodeInTileVolume.Add(worldNodes[x, y]);
+                    if ((x >= 0) && (x < numNodeWidth) &&
+                        (y >= 0) && (y < numNodeHeight))
+                    {
+                        nodeInTileVolume.Add(worldNodes[x, y]);
+                    }
                 }
             }
             
@@ -104,14 +115,23 @@ namespace C_Sharp_Final_Project
 		
 		public void SetLevelGroupNodes(Node currentNode, int occupationLevel, int neighborDepth)
 		{
-			foreach (Node neighbor in PossibleNodeNeighbors(currentNode, neighborDepth)){
-				if (neighbor.rLevel == currentNode.rLevel) {
-					neighbor.rLevel = occupationLevel;
-				}
-			}				
+			foreach (Node neighbor in PossibleNodeNeighbors(currentNode, neighborDepth))
+				neighbor.rLevel = occupationLevel;	
 			currentNode.rLevel = occupationLevel;
 		}
-		
+
+        public void SetLevelGroupNodes(Node currentNode, int occupationLevel, int neighborDepth, int specifiedLevelChange)
+        {
+            foreach (Node neighbor in PossibleNodeNeighbors(currentNode, neighborDepth))
+            {
+                if (neighbor.rLevel == specifiedLevelChange)
+                {
+                    neighbor.rLevel = occupationLevel;
+                }
+            }
+            currentNode.rLevel = occupationLevel;
+        }
+
         public void RenderNodes()
         {
             Node playerNode = NodeFromWorld(new Vector(Game.Player.xpos, Game.Player.ypos));
@@ -124,14 +144,14 @@ namespace C_Sharp_Final_Project
                 if (node == playerNode) {
                     SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
                 }
-                else if (node.rLevel == 1)
+                else if (node.path)
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
                 } else if (node.rLevel == 3)
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 90, 25, 90, 0);
                 }
-                else if (node.path) {
+                else if (node.rLevel == 1) {
                     SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 0, 0);
                 }
                 else if (node.walkable)

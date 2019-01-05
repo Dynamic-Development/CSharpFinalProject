@@ -62,19 +62,12 @@ namespace C_Sharp_Final_Project
                     }// testing 
                     if (path != null)
                     {
-                        if (currentTargetIndex == path.Count)
+                        for (int i = currentTargetIndex - 1; i < path.Count; i++)
                         {
-                            for(int i = currentTargetIndex; i < path.Count; i++) 
-                            {
-                                Game.Grid.SetLevelGroupNodes(path[i], 0, RADIUS_IN_NODES, 1);
-                            }
-                        } else
-                        {
-                            foreach (Node node in path)
-                            {
-                                Game.Grid.SetLevelGroupNodes(node, 0, RADIUS_IN_NODES);
-                            }
+                            if (i >= 0)
+                                Game.Grid.SetLevelGroupNodes(path[i], 0, RADIUS_IN_NODES);
                         }
+                        Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 3, 2);
                     }
                     Game.Pathmanager.RequestPath(position, targetPosition, SHOOTING_RANGE, OnPathFound);
                     pathPending = true;
@@ -82,11 +75,25 @@ namespace C_Sharp_Final_Project
                 
             } else if (path != null)
             {
-               // if (Component.DistanceOfPointsLessThan(targetPosition, position, SHOOTING_RANGE) && Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls))
+                /*
+                if (Component.DistanceOfPointsLessThan(targetPosition, position, SHOOTING_RANGE) &&
+                    !Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls))
+                {
+                    for (int i = currentTargetIndex - 1; i < path.Count; i++)
+                    {
+                        if (i >= 0)
+                            Game.Grid.SetLevelGroupNodes(path[i], 0, RADIUS_IN_NODES);
+                    }
+                    Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 3, 2);
+                }
+                else
+                {
+                */
                 if (currentTargetIndex < path.Count)
                 {
                     bool nearAnotherEnemy = false;
-                    foreach (Enemy e in Game.Enemy) {
+                    foreach (Enemy e in Game.Enemy)
+                    {
                         if (e != this)
                             nearAnotherEnemy = Component.DistanceOfPointsLessThan(position, e.position, radius * 2);
                         if (nearAnotherEnemy)
@@ -94,7 +101,8 @@ namespace C_Sharp_Final_Project
                     }
                     if (!nearAnotherEnemy)
                         position = LocateNextPosition();
-                } else
+                }
+                else
                 {
                     if (currentTargetIndex - 1 >= 0)
                     {
@@ -102,6 +110,7 @@ namespace C_Sharp_Final_Project
                     }
                     //shoot bullets
                 }
+                
             } 
             
         }

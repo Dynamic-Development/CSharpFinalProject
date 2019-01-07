@@ -18,7 +18,7 @@ namespace C_Sharp_Final_Project
 
         public static bool[] KeyStates = new bool[4];
         public static List<Tile> Walls = new List<Tile>();
-        public static List<Enemy> Enemy;
+        public static List<Enemy> Enemy = new List<Enemy>();
         public static Player Player;
 
         public Game(){}
@@ -36,18 +36,16 @@ namespace C_Sharp_Final_Project
                 SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
                 isRunning = true;
             }
-
+            Scene.SetUpScene("Scenes/level1.txt");
             Pathmanager = new Pathmaster();
 
-            Player = new Player(200, 300, 56, 36, "Textures/Player.png");
+            Player = new Player(new Vector(200, 300), 56, 36, "Textures/Player.png");
 
             Enemy = new List<Enemy>
             {
                 new Enemy(new Vector(200, 100), 32, 32, "Textures/Test2.png"),
                 new Enemy(new Vector(200, 500), 32, 32, "Textures/Test2.png")
             };
-            
-            Scene.SetUpScene("Scenes/level1.txt");
         }
 
         public void HandleEvents()
@@ -75,7 +73,7 @@ namespace C_Sharp_Final_Project
                     }
                     break;
                 case SDL_EventType.SDL_MOUSEBUTTONDOWN:
-                    Console.WriteLine("Player pos: {0}, {1}", Player.xpos, Player.ypos);
+                    Console.WriteLine("Player pos: {0}, {1}", Player.position);
                     Console.WriteLine("Enemy pos: {0}", Enemy[0].position);
                     break;
                 default: isRunning = true; break;
@@ -97,7 +95,7 @@ namespace C_Sharp_Final_Project
 
             SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
             SDL_RenderClear(Renderer);
-            
+
             //Render Objects
             Grid.RenderNodes();
             Player.Render();
@@ -107,8 +105,6 @@ namespace C_Sharp_Final_Project
                 Walls[i].Render();
 
             SDL_RenderPresent(Renderer);
-
-            
         }
 
         public void Clean()

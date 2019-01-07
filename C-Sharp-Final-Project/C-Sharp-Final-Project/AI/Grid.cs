@@ -77,81 +77,39 @@ namespace C_Sharp_Final_Project
 
         public Node NodeFromWorld(Vector worldPosition)
         {
-            try
-            {
-                int xi = (int)Math.Round((worldPosition.X - halfNodeWidth) / nodeWidth, MidpointRounding.AwayFromZero);
-                int yi = (int)Math.Round((worldPosition.Y - halfNodeHeight) / nodeHeight, MidpointRounding.AwayFromZero);
+            int xi = (int) Math.Round((worldPosition.X - halfNodeWidth) / nodeWidth, MidpointRounding.AwayFromZero);
+            int yi = (int) Math.Round((worldPosition.Y - halfNodeHeight) / nodeHeight, MidpointRounding.AwayFromZero);
 
-                return worldNodes[xi, yi];
-            }
-            catch (IndexOutOfRangeException)
-            {
-                return null;
-            }
+            return worldNodes[xi, yi];
         }
 
-        public List<Node> TileNodes(int fromXTile, int fromYTile, int toXTile, int toYTile, int overlay)
+        public Node[] GroupNodesTileArea(int fromXTile, int fromYTile, int toXTile, int toYTile)
         {
             int widthTiles = toXTile - fromXTile;
-            int heightTiles = toYTile - fromYTile;
-            List<Node> nodeInTileVolume = new List<Node>();
+            int heightTiles = toYTile - fromXTile;
+            Node[] nodeInTileArea = new Node[(heightTiles) * (widthTiles) * NODES_PER_TILE * NODES_PER_TILE];
             int fromXNode = fromXTile * NODES_PER_TILE;
             int fromYNode = fromYTile * NODES_PER_TILE;
-            
-            for (int x = fromXNode - overlay; x < ((widthTiles + 1) * NODES_PER_TILE + fromXNode + overlay); x++)
-            {
-                for (int y = fromYNode - overlay; y < ((heightTiles + 1) * NODES_PER_TILE + fromYNode + overlay); y++)
-                {
-                    if ((x >= 0) && (x < numNodeWidth) &&
-                        (y >= 0) && (y < numNodeHeight))
-                    {
-                        nodeInTileVolume.Add(worldNodes[x, y]);
-                    }
+            int tempIndex = 0;
+            for (int x = fromXNode; x < ((widthTiles) * NODES_PER_TILE + fromXNode); x++)
+                for (int y = fromYNode; y < ((heightTiles) * NODES_PER_TILE + fromYNode); y++) {
+                    nodeInTileArea[tempIndex++] = worldNodes[x, y];
                 }
-            }
-            
-            return nodeInTileVolume;
-        }
-		
-		public void SetLevelGroupNodes(Node currentNode, int occupationLevel, int neighborDepth)
-		{
-			foreach (Node neighbor in PossibleNodeNeighbors(currentNode, neighborDepth))
-				neighbor.rLevel = occupationLevel;	
-			currentNode.rLevel = occupationLevel;
-		}
-
-        public void SetLevelGroupNodes(Node currentNode, int occupationLevel, int neighborDepth, int specifiedLevelChange)
-        {
-            foreach (Node neighbor in PossibleNodeNeighbors(currentNode, neighborDepth))
-            {
-                if (neighbor.rLevel == specifiedLevelChange)
-                {
-                    neighbor.rLevel = occupationLevel;
-                }
-            }
-            currentNode.rLevel = occupationLevel;
+            return nodeInTileArea;
         }
 
         public void RenderNodes()
         {
-            Node playerNode = NodeFromWorld(new Vector(Game.Player.xpos, Game.Player.ypos));
-
-
             foreach(Node node in worldNodes)
             {
                 rect.x = (int)(node.worldPosition.X - (nodeWidth / 2));
                 rect.y = (int)(node.worldPosition.Y - (nodeHeight / 2));
-                if (node == playerNode) {
-                    SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
-                }
-                else if (node.path)
+
+                if (node.endPoint)
                 {
                     SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
-                } else if (node.rLevel == 3)
-                {
-                    SDL_SetRenderDrawColor(Game.Renderer, 90, 25, 90, 0);
                 }
-                else if (node.rLevel == 1) {
+                else if (node.path) {
                     SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 0, 0);
                 }
                 else if (node.walkable)

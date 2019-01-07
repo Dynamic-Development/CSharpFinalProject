@@ -10,7 +10,7 @@ namespace C_Sharp_Final_Project
         public int tileWidth;
         public int tileHeight;
         public Node[,] worldNodes;
-        public int numNodeWidth, numNodeHeight;
+        public int numNodeWidth, numNodeHeight, numTileWidth, numTileHeight;
 
         private const int NODES_PER_TILE = 3;
 
@@ -21,6 +21,9 @@ namespace C_Sharp_Final_Project
 
         public Grid(int worldWidth, int worldHeight, int numTileWidth, int numTileHeight)
         {
+            this.numTileHeight = numTileHeight;
+            this.numTileWidth = numTileWidth;
+
             numNodeWidth = numTileWidth * NODES_PER_TILE;
             numNodeHeight = numTileHeight * NODES_PER_TILE;
 
@@ -132,9 +135,17 @@ namespace C_Sharp_Final_Project
             currentNode.rLevel = occupationLevel;
         }
 
+        public Vector? ConvertTileUnitsIntoPixels(int tileUnitX, int tileUnitY)
+        {
+            if (tileUnitX >= 0 && tileUnitX < numTileWidth &&
+                tileUnitY >= 0 && tileUnitY < numTileHeight)
+                return new Vector(tileWidth * (tileUnitX + 0.5), tileHeight * (tileUnitY + 0.5));
+            return null;
+        }
+
         public void RenderNodes()
         {
-            Node playerNode = NodeFromWorld(new Vector(Game.Player.xpos, Game.Player.ypos));
+            Node playerNode = NodeFromWorld(Game.Player.position);
 
 
             foreach(Node node in worldNodes)

@@ -8,7 +8,7 @@ namespace C_Sharp_Final_Project
     class Enemy
     {
         private const int SPEED = 1; //May subject to change
-        private const int SHOOTING_RANGE = 200;
+        private const int SHOOTING_RANGE = 90;
 
         public Vector position;
         public Vector velocity;
@@ -23,8 +23,6 @@ namespace C_Sharp_Final_Project
         private bool pathPending;
         private Vector targetPosition;
 
-		private int radiusInNodes = 2;
-		
         public Enemy(Vector position, int width, int height, string texture)
         {
             objTexture = Texture.LoadTexture(texture);
@@ -34,9 +32,7 @@ namespace C_Sharp_Final_Project
 
             searchPlayerCoolDown = 0;
             pathPending = false;
-			
-			Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 2, radiusInNodes);
-			
+
             dest.w = width;
             dest.h = height;
         }
@@ -44,43 +40,38 @@ namespace C_Sharp_Final_Project
         public void Update()
         { 
             //finding new path
-            if (Component.CoolDown(ref searchPlayerCoolDown, 50) &&
-               (targetPosition.X != Game.Player.xpos ||
-                targetPosition.Y != Game.Player.ypos))
+            if (Component.CoolDown(ref searchPlayerCoolDown, 5))
             {
-                targetPosition.Y = Game.Player.ypos;
-                targetPosition.X = Game.Player.xpos;
-                if (!pathPending && 
-                    (Component.DistanceOfPoints(targetPosition, position) > SHOOTING_RANGE ||
-                    Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls)))
+                if (targetPosition.X != Game.Player.xpos ||
+                    targetPosition.Y != Game.Player.ypos)
                 {
-                    if (path != null)
+                    targetPosition.Y = Game.Player.ypos;
+                    targetPosition.X = Game.Player.xpos;
+                    if (!pathPending)
                     {
-                        foreach (Node node in path)
-                            node.path = false;
-                    }// testing 
-                    if (path != null)
-                    {
-                        foreach (Node node in path)
+                        if (path != null)
                         {
-                            Game.Grid.SetLevelGroupNodes(node, 0, radiusInNodes);
-                        }
+                            foreach (Node node in path)
+                                node.path = false;
+                        }// testing 
+                        if (path != null)
+                            foreach (Node endNode in Game.Grid.PossibleNodeNeighbors(path[path.Count - 1], 2))
+                                endNode.endPoint = false;
+
+                        Game.Pathmanager.RequestPath(position, targetPosition, SHOOTING_RANGE, OnPathFound);
+                        pathPending = true;
                     }
-                    Game.Pathmanager.RequestPath(position, targetPosition, SHOOTING_RANGE, OnPathFound);
-                    pathPending = true;
                 }
-                
-            } else if (path != null)
+            }
+
+            //moving
+            if (path != null)
             {
                 if (currentTargetIndex < path.Count)
                 {
-                    position = LocateNextPosition();
+                    position = PinPointPosition(ref currentTargetIndex);
                 } else
                 {
-                    if (currentTargetIndex - 1 >= 0)
-                    {
-                        Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, radiusInNodes, 1);
-                    }
                     //shoot bullets
                 }
             } 
@@ -93,62 +84,54 @@ namespace C_Sharp_Final_Project
             {
                 path = foundPath;
 
-                for (int i = 0; i < path.Count; i++)
-                {
-                    if (i == path.Count - 1)
-                        Game.Grid.SetLevelGroupNodes(path[i], 3, radiusInNodes);
-                    else
-                        Game.Grid.SetLevelGroupNodes(path[i], 1, radiusInNodes);
-                }
-                currentTargetIndex = 0;
+                foreach (Node endNode in Game.Grid.PossibleNodeNeighbors(path[path.Count - 1], 2))
+                    endNode.endPoint = true;
+
+                currentTargetIndex = 1;
             }
-           
             pathPending = false;   
         }
 
-        private Vector LocateNextPosition()
+        private Vector PinPointPosition(ref int targetIndex)
         {
             Vector newPosition = position;
             Vector newDirection = direction;
             double incrementSpeed = SPEED;
             double currentDistance;
 
-            while (currentTargetIndex < path.Count)
+            while (targetIndex < path.Count)
             {
-                currentDistance = Component.DistanceOfPoints(newPosition, path[currentTargetIndex].worldPosition);
+                currentDistance = Component.DistanceOfPoints(newPosition.X, newPosition.Y,
+                                                             path[targetIndex].worldPosition.X,
+                                                             path[targetIndex].worldPosition.Y);
                 if (incrementSpeed > currentDistance)
                 {
                     incrementSpeed = incrementSpeed - currentDistance;
-                    newPosition = path[currentTargetIndex].worldPosition;
-                    if (currentTargetIndex - 1 >= 0)
+                    newPosition = path[targetIndex].worldPosition;
+                    if (targetIndex + 1 == path.Count)
                     {
-                        Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, radiusInNodes, 1);
-                    }
-                    if (currentTargetIndex + 1 == path.Count)
-                    {
+                        newPosition = path[targetIndex].worldPosition;
                         break;
                     }
                     else
                     {
-                        currentTargetIndex++;
-                        currentDistance = Component.DistanceOfPoints(newPosition, path[currentTargetIndex].worldPosition);
+                        targetIndex++;
+                        currentDistance = Component.DistanceOfPoints(newPosition.X, newPosition.Y,
+                                                                 path[targetIndex].worldPosition.X,
+                                                                 path[targetIndex].worldPosition.Y);
                     }
                 }
                 if (incrementSpeed < currentDistance)
                 {
-                    direction = (path[currentTargetIndex].worldPosition - newPosition) / currentDistance;
+                    direction = (path[targetIndex].worldPosition - newPosition) / currentDistance;
                     velocity = direction * incrementSpeed;
                     newPosition += velocity;
                     break;
                 }
                 if (incrementSpeed == currentDistance)
                 {
-                    if (currentTargetIndex - 1 >= 0)
-                    {
-                        Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, radiusInNodes, 1);
-                    }
-                    newPosition = path[currentTargetIndex].worldPosition;
-                    currentTargetIndex++;
+                    newPosition = path[targetIndex].worldPosition;
+                    targetIndex++;
                     break;
                 }
 

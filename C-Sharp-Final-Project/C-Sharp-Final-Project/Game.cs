@@ -36,7 +36,7 @@ namespace C_Sharp_Final_Project
                 SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
                 isRunning = true;
             }
-            Scene.SetUpScene("Scenes/level1.txt");
+
             Pathmanager = new Pathmaster();
 
             Player = new Player(200, 300, 56, 36, "Textures/Player.png");
@@ -47,7 +47,7 @@ namespace C_Sharp_Final_Project
                 new Enemy(new Vector(200, 500), 32, 32, "Textures/Test2.png")
             };
             
-            
+            Scene.SetUpScene("Scenes/level1.txt");
         }
 
         public void HandleEvents()
@@ -100,7 +100,7 @@ namespace C_Sharp_Final_Project
             
             //Render Objects
             Grid.RenderNodes();
-            //Player.Render();
+            Player.Render();
             for (int e = 0; e < Enemy.Count; e++)
                 Enemy[e].Render();
             for (int i = 0; i < Walls.Count; i++)

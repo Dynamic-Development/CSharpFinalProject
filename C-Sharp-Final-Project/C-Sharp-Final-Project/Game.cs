@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Collections.Generic;
 using static SDL2.SDL;
 
@@ -8,14 +9,17 @@ namespace C_Sharp_Final_Project
     {
         private bool isRunning;
         private IntPtr window;
-        private Level currentLevel;
+
         public static IntPtr Renderer;
         public static Grid Grid;
         public static int Width;
         public static int Height;
-        private Enemy enemy;
-        private Player player;
-        public bool[] playermover = new bool[4];
+        public static Pathmaster Pathmanager;
+
+        public static bool[] KeyStates = new bool[4];
+        public static List<Tile> Walls = new List<Tile>();
+        public static List<Enemy> Enemy;
+        public static Player Player;
 
         public Game(){}
         
@@ -24,6 +28,7 @@ namespace C_Sharp_Final_Project
             SDL_WindowFlags flags = 0;
             Width = width;
             Height = height;
+
             if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
             {
                 window = SDL_CreateWindow(title, xPos, yPos, width, height, flags);
@@ -31,14 +36,18 @@ namespace C_Sharp_Final_Project
                 SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
                 isRunning = true;
             }
-            enemy = new Enemy(100, 100, 32, 32, "Textures/Test2.png");
-            player = new Player(200, 100, 56, 36, "Textures/Player.png");
-        }
+            Scene.SetUpScene("Scenes/level1.txt");
+            Pathmanager = new Pathmaster();
 
-        private void SetUpNextLevel(string levelFilePath) //Calls in Update
-        {
-            currentLevel = new Level(levelFilePath);
-            Grid = currentLevel.grid;
+            Player = new Player(200, 300, 56, 36, "Textures/Player.png");
+
+            Enemy = new List<Enemy>
+            {
+                new Enemy(new Vector(200, 100), 32, 32, "Textures/Test2.png"),
+                new Enemy(new Vector(200, 500), 32, 32, "Textures/Test2.png")
+            };
+            
+            
         }
 
         public void HandleEvents()
@@ -47,71 +56,59 @@ namespace C_Sharp_Final_Project
             SDL_PollEvent(out events);
             switch (events.type)
             {
-                case SDL_EventType.SDL_QUIT:
-                    isRunning = false;
-                    break;
+                case SDL_EventType.SDL_QUIT: isRunning = false; break;
                 case SDL_EventType.SDL_KEYDOWN:
-                    if (events.key.keysym.sym == SDL_Keycode.SDLK_w)
-                        playermover[0] = true;
-                    if (events.key.keysym.sym == SDL_Keycode.SDLK_a)
-                        playermover[1] = true;
-                    if (events.key.keysym.sym == SDL_Keycode.SDLK_s)
-                        playermover[2] = true;
-                    if (events.key.keysym.sym == SDL_Keycode.SDLK_d)
-                        playermover[3] = true;
+                    switch (events.key.keysym.sym) {
+                        case SDL_Keycode.SDLK_w: KeyStates[0] = true; break;
+                        case SDL_Keycode.SDLK_a: KeyStates[1] = true; break;
+                        case SDL_Keycode.SDLK_s: KeyStates[2] = true; break;
+                        case SDL_Keycode.SDLK_d: KeyStates[3] = true; break;
+                    }
                     break;
                 case SDL_EventType.SDL_KEYUP:
-                    if (events.key.keysym.sym == SDL_Keycode.SDLK_w)
-                        playermover[0] = false;
-                    if (events.key.keysym.sym == SDL_Keycode.SDLK_a)
-                        playermover[1] = false;
-                    if (events.key.keysym.sym == SDL_Keycode.SDLK_s)
-                        playermover[2] = false;
-                    if (events.key.keysym.sym == SDL_Keycode.SDLK_d)
-                        playermover[3] = false;
+                    switch (events.key.keysym.sym)
+                    {
+                        case SDL_Keycode.SDLK_w: KeyStates[0] = false; break;
+                        case SDL_Keycode.SDLK_a: KeyStates[1] = false; break;
+                        case SDL_Keycode.SDLK_s: KeyStates[2] = false; break;
+                        case SDL_Keycode.SDLK_d: KeyStates[3] = false; break;
+                    }
                     break;
-                default:
-                    isRunning = true;
+                case SDL_EventType.SDL_MOUSEBUTTONDOWN:
+                    Console.WriteLine("Player pos: {0}, {1}", Player.xpos, Player.ypos);
+                    Console.WriteLine("Enemy pos: {0}", Enemy[0].position);
                     break;
-
+                default: isRunning = true; break;
             }
         }
 
         public void Update()
         {
-            if (playermover[0] == true)
-            {
-                player.yvel--;
-            }
-            if (playermover[1] == true)
-            {
-                player.xvel--;
-            }
-            if (playermover[2] == true)
-            {
-                player.yvel++;
-            }
-            if (playermover[3] == true)
-            {
-                player.xvel++;
-            }
-
             //Update Objects
-            enemy.Update();
-            player.Update();
+            Player.Update();
+            for (int e = 0; e < Enemy.Count; e++)
+                Enemy[e].Update();
             
+            Pathmanager.TryProcessNext(Component.CoolDown(ref Pathmanager.nextPathCoolDown, 3));
         }
 
         public void Render()
         {
+
             SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
             SDL_RenderClear(Renderer);
-
+            
             //Render Objects
-            enemy.Render();
-            player.Render();
+            Grid.RenderNodes();
+            //Player.Render();
+            for (int e = 0; e < Enemy.Count; e++)
+                Enemy[e].Render();
+            for (int i = 0; i < Walls.Count; i++)
+                Walls[i].Render();
 
             SDL_RenderPresent(Renderer);
+
+            
         }
 
         public void Clean()

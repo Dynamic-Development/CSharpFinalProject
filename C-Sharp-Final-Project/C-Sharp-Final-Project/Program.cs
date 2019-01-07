@@ -14,7 +14,7 @@ namespace C_Sharp_Final_Project
             uint frameStart = 0;
             int frameTime = 0;
 
-            game.Init("2D Game Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600);
+            game.Init("2D Game Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 900, 600);
 
             while (game.Running())
             {

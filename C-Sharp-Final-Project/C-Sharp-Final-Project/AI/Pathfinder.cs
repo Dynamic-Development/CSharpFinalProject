@@ -1,66 +1,76 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 
-
-namespace C_Sharp_Final_Project.EnemyAI
+namespace C_Sharp_Final_Project
 {
     class Pathfinder
     {
-        private List<Node> nodePath;
+        List<Node> nodePath;
 
-        public Pathfinder() { }
-        public List<Node> ReturnPath(int xPos, int yPos, int targetXPos, int targetYPos)
+        public void FindPath(Vector start, Vector target, double distFromTarget)
         {
-            FindPath(xPos, yPos, targetXPos, targetYPos);
-            return nodePath;
-        }
-        private void FindPath(int xPos, int yPos, int targetXPos, int targetYPos)
-        {
-            Node startNode = Game.Grid.NodeFromWorld(xPos, yPos);
-            Node targetNode = Game.Grid.NodeFromWorld(targetXPos, targetYPos);
+            bool success = false;
+            Node targetNode = Game.Grid.NodeFromWorld(target);
 
-            List<Node> openSet = new List<Node>();
-            HashSet<Node> closedSet = new HashSet<Node>();
-            openSet.Add(startNode);
-
-            while (openSet.Count > 0)
+            if (targetNode != null && targetNode.walkable)
             {
-                Node currentNode = openSet[0];
-                for (int i = 1; i < openSet.Count; i++)
-                {
-                    if (openSet[i].fCost < currentNode.fCost || 
-                        openSet[i].fCost == currentNode.fCost && 
-                        openSet[i].hCost < currentNode.hCost)
-                        currentNode = openSet[i];
-                }
+                Node startNode = Game.Grid.NodeFromWorld(start);
+                Game.Grid.SetLevelGroupNodes(startNode, 0, 2);
 
-                openSet.Remove(currentNode);
-                closedSet.Add(currentNode);
+                Heap<Node> openSet = new Heap<Node>(Game.Grid.numNodeHeight * Game.Grid.numNodeWidth);
+                HashSet<Node> closedSet = new HashSet<Node>();
+                openSet.Add(startNode);
 
-                if (currentNode == targetNode)
+                while (openSet.Count > 0)
                 {
-                    RetracePath(startNode, targetNode);
-                }
+                    Node currentNode = openSet.RemoveFirst();
+                    closedSet.Add(currentNode);
 
-                foreach(Node neighbor in Game.Grid.NodeNeighbors(currentNode))
-                {
-                    if (!neighbor.walkable || closedSet.Contains(neighbor))
-                        continue;
-                    int moveCost = currentNode.gCost + NodeDistance(currentNode, neighbor);
-                    if (moveCost < neighbor.gCost ||
-                        !openSet.Contains(neighbor))
+                    if (currentNode == targetNode)
                     {
-                        neighbor.gCost = moveCost;
-                        neighbor.hCost = NodeDistance(neighbor, targetNode);
-                        neighbor.parent = currentNode;
-                        if (!openSet.Contains(neighbor))
-                            openSet.Add(neighbor);
+                        success = true;
+                        break;
                     }
 
+                    foreach (Node neighbor in Game.Grid.PossibleNodeNeighbors(currentNode, 1))
+                    {
+
+                        if (closedSet.Contains(neighbor) || neighbor.rLevel != 0 || !neighbor.walkable)
+                            continue;
+                        else
+                        {
+                            bool neighborNodeUnavailable = false;
+                            foreach (Node subNeighbor in Game.Grid.PossibleNodeNeighbors(currentNode, 2))
+                                if (subNeighbor.rLevel != 0 || !subNeighbor.walkable)
+                                {
+                                    neighborNodeUnavailable = true;
+                                    break;
+                                }
+                            if (neighborNodeUnavailable)
+                                continue;
+                        }
+
+                        int moveCost = currentNode.gCost + NodeDistance(currentNode, neighbor);
+                        if (moveCost < neighbor.gCost || !openSet.Contains(neighbor))
+                        {
+                            neighbor.gCost = moveCost;
+                            neighbor.hCost = NodeDistance(neighbor, targetNode);
+                            neighbor.parent = currentNode;
+                            if (!openSet.Contains(neighbor))
+                                openSet.Add(neighbor);
+                            else
+                                openSet.UpdateItem(neighbor);
+                        }
+                    }
                 }
+                if (success)
+                    RetracePath(startNode, targetNode, distFromTarget);
             }
+            Game.Pathmanager.FinishedrocessingPath(nodePath, success);
         }
-        private void RetracePath(Node startNode, Node targetNode)
+
+        private void RetracePath(Node startNode, Node targetNode, double distFromTarget)
         {
             nodePath = new List<Node>();
             Node currentNode = targetNode;
@@ -69,16 +79,41 @@ namespace C_Sharp_Final_Project.EnemyAI
                 nodePath.Add(currentNode);
                 currentNode = currentNode.parent;
             }
+
             nodePath.Reverse();
+			
+			//Evaluate path and cutting off range.
+            for (int i = 0; i < nodePath.Count; i++)
+            {
+                if (Component.DistanceOfPoints(nodePath[i].worldPosition, nodePath[nodePath.Count - 1].worldPosition) < distFromTarget &&
+                    !Raycaster.AreWallsBlockView(nodePath[i].worldPosition, nodePath[nodePath.Count - 1].worldPosition, Game.Walls)
+                    )
+                {
+                    nodePath.RemoveRange(i + 1, nodePath.Count - 1 - i);
+                    break;
+                }
+            }
+
+            //If a previous node was marked as endpoint, it probably means that this path is wrong. Highly unlikely but a safe catch.
+            for (int j = 0; j < nodePath.Count - 2; j++)
+            {
+                if (nodePath[j].rLevel == 3)
+                {
+                    nodePath.RemoveRange(j + 1, nodePath.Count - 1 - j);
+                    break;
+                }
+            }
+
+            foreach (Node node in nodePath)
+                node.path = true; // testing
         }
+
         private int NodeDistance(Node nodea, Node nodeb)
         {
-            int distX = Math.Abs(nodea.gridX - nodeb.gridX);
-            int distY = Math.Abs(nodea.gridY - nodeb.gridY);
+            Vector dist = new Vector(Math.Abs(nodea.gridPosition.X - nodeb.gridPosition.X),
+                                     Math.Abs(nodea.gridPosition.Y - nodeb.gridPosition.Y));
 
-            if (distX > distY)
-                return 14 * distY + 10 * (distX - distY);
-            return 14 * distX + 10 * (distY - distX);
-        } 
+            return dist.X > dist.Y ? (int) (14 * dist.Y + 10 * (dist.X - dist.Y)) : (int) (14 * dist.X + 10 * (dist.Y - dist.X));
+        }
     }
 }

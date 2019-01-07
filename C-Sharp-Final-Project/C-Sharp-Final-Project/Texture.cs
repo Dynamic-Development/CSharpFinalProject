@@ -3,7 +3,7 @@ using SDL2;
 
 namespace C_Sharp_Final_Project
 {
-    class Textures
+    class Texture
     {
         public static IntPtr LoadTexture(string texturePath)
         {

@@ -9,7 +9,7 @@ namespace C_Sharp_Final_Project
         public Vector position;
         private IntPtr texture;
         private SDL_Rect dest;
-        
+        private int[] boundary;
         public int xvel;
         public int yvel;
         public Player(Vector position, int width, int height, string texturePath)
@@ -29,9 +29,27 @@ namespace C_Sharp_Final_Project
             if (Game.KeyStates[1]) xvel--;
             if (Game.KeyStates[2]) yvel++;
             if (Game.KeyStates[3]) xvel++;
+            bool collide = false;
+            Vector newPosition = new Vector(position.X + (xvel * 5), position.Y + (yvel * 5));
 
-            position.X = position.X + (xvel * 5);
-            position.Y = position.Y + (yvel * 5);
+            foreach (Tile wall in Game.Walls)
+            {
+                Console.WriteLine(wall.boundary[0] + " " + wall.boundary[1] + " " + wall.boundary[2] + " " + wall.boundary[3] + " " + newPosition);
+                if (newPosition.X > wall.boundary[0] && newPosition.X < wall.boundary[2] && newPosition.Y > wall.boundary[1] && newPosition.Y < wall.boundary[3])
+                {
+                    
+                    collide = true;
+                    break;
+                }
+            }
+            if (collide == false)
+            {
+                position = newPosition; 
+            }
+            
+
+
+            
             xvel = 0;
             yvel = 0;
 

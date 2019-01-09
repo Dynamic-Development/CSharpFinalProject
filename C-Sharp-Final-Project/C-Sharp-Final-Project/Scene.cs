@@ -25,11 +25,12 @@ namespace C_Sharp_Final_Project
                     line = line.Substring(2);
                     tempIndexes = line.Split('x').Select(x => int.Parse(x)).ToArray();
                     Game.Grid = new Grid(Game.Width, Game.Height, tempIndexes[0], tempIndexes[1]);
+                    Game.Walls.Add(new Tile(0,0, Game.Grid.numTileWidth, Game.Grid.numTileHeight, 3));
                     break;
                 case 'W': //Draw Walls
                     line = line.Substring(2);
                     tempIndexes = line.Split(',').Select(x => int.Parse(x)).ToArray();
-                    Game.Walls.Add(new Tile(tempIndexes[0], tempIndexes[1], tempIndexes[2], tempIndexes[3], false));
+                    Game.Walls.Add(new Tile(tempIndexes[0], tempIndexes[1], tempIndexes[2], tempIndexes[3], 1));
                     List<Node> unwalkableNodes = Game.Grid.TileNodes(tempIndexes[0], tempIndexes[1], tempIndexes[2], tempIndexes[3], 1);
                     foreach (Node node in unwalkableNodes)
                         node.walkable = false;

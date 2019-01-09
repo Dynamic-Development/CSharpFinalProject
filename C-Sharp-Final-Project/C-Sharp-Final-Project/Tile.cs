@@ -8,7 +8,7 @@ namespace C_Sharp_Final_Project
     {
         private IntPtr objTexture;
         private SDL_Rect[] objDests;
-        public int[] boundary { get; }
+        public Vector[] boundary { get; }
         public Vector[][] segments { get; }
         public Vector[] points { get; }
 
@@ -17,16 +17,14 @@ namespace C_Sharp_Final_Project
             int widthTiles = toXTile - fromXTile;
             int heightTiles = toYTile - fromYTile;
 
-            boundary = new int[] {Game.Grid.tileWidth * fromXTile,
-                                  Game.Grid.tileHeight * fromYTile,
-                                  Game.Grid.tileWidth * (1 + toXTile),
-                                  Game.Grid.tileHeight * (1 + toYTile)};
+            boundary = new Vector[] {new Vector(Game.Grid.tileWidth * fromXTile, Game.Grid.tileHeight * fromYTile),
+                                     new Vector(Game.Grid.tileWidth * (1 + toXTile), Game.Grid.tileHeight * (1 + toYTile))};
 
             points = new Vector[4];
-            points[0] = new Vector(boundary[0], boundary[1]);
-            points[1] = new Vector(boundary[2], boundary[1]);
-            points[2] = new Vector(boundary[2], boundary[3]);
-            points[3] = new Vector(boundary[0], boundary[3]);
+            points[0] = boundary[0];
+            points[1] = new Vector(boundary[1].X, boundary[0].Y);
+            points[2] = boundary[1];
+            points[3] = new Vector(boundary[0].X, boundary[1].Y);
 
             segments = new Vector[4][];
             segments[0] = new Vector[] { points[0], points[1] };

@@ -24,14 +24,20 @@ namespace C_Sharp_Final_Project
             return ((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y)) <= (distRange * distRange);
         }
 
-        public static double DistanceOfPoints(double x1, double y1, double x2, double y2)
+        public static bool BoundaryCheck(Vector minPoint, Vector maxPoint, Vector checkLocation)
         {
-            return Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+            if (checkLocation.X > minPoint.X && checkLocation.X < maxPoint.X &&
+                checkLocation.Y > minPoint.Y && checkLocation.Y < maxPoint.Y)
+            {
+                return true;
+            }
+            return false;
         }
         
         public static double DistanceOfPoints(Vector a, Vector b)
         {
             return Math.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y));
         }
+        
     }
 }

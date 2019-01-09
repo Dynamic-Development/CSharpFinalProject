@@ -49,6 +49,7 @@
     <Compile Include="AI\Heap.cs" />
     <Compile Include="AI\Pathmaster.cs" />
     <Compile Include="AI\Raycaster.cs" />
+    <Compile Include="Bullet.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="AI\Pathfinder.cs" />

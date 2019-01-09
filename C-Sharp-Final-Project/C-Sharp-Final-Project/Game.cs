@@ -18,8 +18,11 @@ namespace C_Sharp_Final_Project
 
         public static bool[] KeyStates = new bool[4];
         public static List<Tile> Walls = new List<Tile>();
-        public static List<Enemy> Enemy = new List<Enemy>();
+        public static List<Enemy> Enemies = new List<Enemy>();
+        public static List<Bullet> Bullets = new List<Bullet>();
         public static Player Player;
+        public static int mousePosX;
+        public static int mousePosY;
 
         public Game(){}
         
@@ -41,7 +44,7 @@ namespace C_Sharp_Final_Project
 
             Player = new Player(new Vector(200, 300), 56, 36, "Textures/Player.png");
 
-            Enemy = new List<Enemy>
+            Enemies = new List<Enemy>
             {
                 new Enemy(new Vector(200, 100), 32, 32, "Textures/Test2.png"),
                 new Enemy(new Vector(200, 500), 32, 32, "Textures/Test2.png")
@@ -73,21 +76,23 @@ namespace C_Sharp_Final_Project
                     }
                     break;
                 case SDL_EventType.SDL_MOUSEBUTTONDOWN:
-                    Console.WriteLine("Player pos: {0}, {1}", Player.position);
-                    Console.WriteLine("Enemy pos: {0}", Enemy[0].position);
+                    Player.Shoot();
                     break;
                 default: isRunning = true; break;
             }
+            SDL_GetMouseState(out mousePosX, out mousePosY);
         }
 
         public void Update()
         {
             //Update Objects
             Player.Update();
-            for (int e = 0; e < Enemy.Count; e++)
-                Enemy[e].Update();
+            for (int e = 0; e < Enemies.Count; e++)
+                Enemies[e].Update();
+            for (int b = 0; b < Bullets.Count; b++)
+                Bullets[b].Update();
             
-            Pathmanager.TryProcessNext(Component.CoolDown(ref Pathmanager.nextPathCoolDown, 3));
+            Pathmanager.TryProcessNext(Component.CoolDown(ref Pathmanager.nextPathCoolDown, 1));
         }
 
         public void Render()
@@ -97,13 +102,14 @@ namespace C_Sharp_Final_Project
             SDL_RenderClear(Renderer);
 
             //Render Objects
-            Grid.RenderNodes();
+           // Grid.RenderNodes();
             Player.Render();
-            for (int e = 0; e < Enemy.Count; e++)
-                Enemy[e].Render();
+            for (int e = 0; e < Enemies.Count; e++)
+                Enemies[e].Render();
             for (int i = 0; i < Walls.Count; i++)
                 Walls[i].Render();
-
+            for (int b = 0; b < Bullets.Count; b++)
+                Bullets[b].Render();
             SDL_RenderPresent(Renderer);
         }
 

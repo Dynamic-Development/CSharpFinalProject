@@ -39,7 +39,7 @@ namespace C_Sharp_Final_Project
                     tempIndexes = line.Split(',').Select(x => int.Parse(x)).ToArray();
                     if (Game.Grid.ConvertTileUnitsIntoPixels(tempIndexes[0], tempIndexes[1]) != null)
                     {
-                        Game.Enemy.Add(new Enemy(Game.Grid.ConvertTileUnitsIntoPixels(tempIndexes[0], tempIndexes[1]).GetValueOrDefault(), 
+                        Game.Enemies.Add(new Enemy(Game.Grid.ConvertTileUnitsIntoPixels(tempIndexes[0], tempIndexes[1]).GetValueOrDefault(), 
                             32, 32, "Textures/Test2.png"));
                     } else
                     {

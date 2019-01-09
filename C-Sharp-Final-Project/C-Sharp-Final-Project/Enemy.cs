@@ -92,7 +92,7 @@ namespace C_Sharp_Final_Project
                 if (currentTargetIndex < path.Count)
                 {
                     bool nearAnotherEnemy = false;
-                    foreach (Enemy e in Game.Enemy)
+                    foreach (Enemy e in Game.Enemies)
                     {
                         if (e != this)
                             nearAnotherEnemy = Component.DistanceOfPointsLessThan(position, e.position, radius * 2);

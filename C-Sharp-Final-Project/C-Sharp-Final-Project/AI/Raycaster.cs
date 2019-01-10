@@ -9,13 +9,11 @@ namespace C_Sharp_Final_Project
         public static bool AreWallsBlockView(Vector fromPoint, Vector toPoint, List<Tile> walls)
         {
             foreach (Tile wall in walls)
-            {   if (wall.level == 1)
+            {
+                foreach (Vector[] segment in wall.segments)
                 {
-                    foreach (Vector[] segment in wall.segments)
-                    {
-                        if (isIntersect(fromPoint, toPoint, segment[0], segment[1]))
-                            return true;
-                    }
+                    if (isIntersect(fromPoint, toPoint, segment[0], segment[1]))
+                        return true;
                 }
             }
             return false;

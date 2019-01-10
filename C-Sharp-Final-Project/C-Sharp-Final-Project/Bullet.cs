@@ -37,7 +37,8 @@ namespace C_Sharp_Final_Project
             {
                 foreach (Vector point in boundary)
                 {
-                    if (Component.BoundaryCheck(wall.boundary[0], wall.boundary[1], point))
+                    if (point.X > wall.boundary[0] && point.X < wall.boundary[2] &&
+                        point.Y > wall.boundary[1] && point.Y < wall.boundary[3])
                     {
                         collide = true;
                         break;

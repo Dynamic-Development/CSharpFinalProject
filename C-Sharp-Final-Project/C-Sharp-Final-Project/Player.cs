@@ -71,18 +71,40 @@ namespace C_Sharp_Final_Project
             {
                 foreach (Vector point in boundary)
                 {
-                    if (Component.BoundaryCheck(wall.boundary[0], wall.boundary[1], point))
+                    if (wall.level == 3)
                     {
-                        collide = true;
+                        if (Component.ScreenBoundaryCheck(wall.boundary[0], wall.boundary[1], point))
+                        {
+                            if (point.X > wall.boundary[0].X || point.X < wall.boundary[1].X)
+                            {
+                                checkNewPosition.X = position.X;
+                                Console.WriteLine("test x");
+                            }
+                            if (point.Y < wall.boundary[1].Y || point.Y > wall.boundary[0].Y)
+                            {
+                                checkNewPosition.Y = position.Y;
+                                Console.WriteLine("test Y");
+                            }
+                            break;
+                        }
+                    }
+                    else if (Component.BoundaryCheck(wall.boundary[0], wall.boundary[1], point))
+                    {
+                        if (point.X > wall.boundary[0].X || point.X < wall.boundary[1].X)
+                        {
+                            checkNewPosition.X = position.X;
+                        }
+                        if (point.Y < wall.boundary[1].Y || point.Y > wall.boundary[0].Y)
+                        {
+                            checkNewPosition.Y = position.Y;
+                        }
                         break;
                     }
+                
                 }
             }
-            if (!collide)
-            {
-                position = checkNewPosition; 
-            }
 
+            position = checkNewPosition; 
             direction = (Math.Atan2(Game.mousePosY - position.Y, Game.mousePosX - position.X)*180)/Math.PI;
         }
         public void Render()

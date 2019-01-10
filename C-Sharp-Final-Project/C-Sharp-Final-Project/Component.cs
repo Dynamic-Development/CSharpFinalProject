@@ -35,11 +35,22 @@ namespace C_Sharp_Final_Project
             return false;
         }
 
+        public static bool ScreenBoundaryCheck(Vector minPoint, Vector maxPoint, Vector checkLocation)
+        {
+            if (checkLocation.X > minPoint.X || checkLocation.X < maxPoint.X ||
+                checkLocation.Y > minPoint.Y || checkLocation.Y < maxPoint.Y)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public static bool BoundaryCheck(Vector minPoint, Vector maxPoint, int posX, int posY)
         {
             if (posX > minPoint.X && posX < maxPoint.X &&
                 posY > minPoint.Y && posY < maxPoint.Y)
             {
+                
                 return true;
             }
             return false;

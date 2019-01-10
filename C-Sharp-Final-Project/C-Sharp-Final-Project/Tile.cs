@@ -38,7 +38,7 @@ namespace C_Sharp_Final_Project
                 segments[2] = new Vector[] { points[2], points[3] };
                 segments[3] = new Vector[] { points[3], points[0] };
 
-                objTexture = Texture.LoadTexture("Textures/Test2.png");
+                objTexture = Texture.LoadTexture("Textures/BrickWall_Base.png");
 
                 objDests = new SDL_Rect[(widthTiles + 1) * (heightTiles + 1)];
 
@@ -57,8 +57,7 @@ namespace C_Sharp_Final_Project
             }
             else if (level == 3)
             {
-                boundary = new Vector[] {new Vector(Game.Grid.tileWidth * (1 + toXTile), Game.Grid.tileHeight * (1 + toYTile)),
-                                         new Vector(Game.Grid.tileWidth * fromXTile, Game.Grid.tileHeight * fromYTile)
+                boundary = new Vector[] {new Vector(Screen.Width, Screen.Height), new Vector(0,0)
                                      };
            
             }

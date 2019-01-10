@@ -15,6 +15,8 @@ namespace C_Sharp_Final_Project
         private SDL_Point point;
         private double direction;
         private int cooldown = 0;
+        public double healthBar = 32;
+        private SDL_Rect health;
         public Player(Vector position, int width, int height, string texturePath)
         {
             this.position = position;
@@ -25,6 +27,9 @@ namespace C_Sharp_Final_Project
             srcrect.h = height;
             dest.w = width;
             dest.h = height;
+            health.h = 15;
+            health.x = 5;
+            health.y = 5;
         }
         
         public void Shoot()
@@ -33,6 +38,8 @@ namespace C_Sharp_Final_Project
             Console.WriteLine("shoot");
             Game.Bullets.Add(new Bullet(true, position, new Vector(Game.mousePosX, Game.mousePosY), "Textures/PlayerBullet.png"));
         }
+
+
 
         public void Update()
         {   
@@ -55,8 +62,7 @@ namespace C_Sharp_Final_Project
                 
                 foreach (Vector point in boundary)
                 {
-                    if (point.X > wall.boundary[0].X && point.X < wall.boundary[1].X && 
-                        point.Y > wall.boundary[0].Y && point.Y < wall.boundary[1].Y)
+                    if (Component.BoundaryCheck(wall.boundary[0], wall.boundary[1], point))
                     {
                         collide = true;
                         break;
@@ -78,10 +84,13 @@ namespace C_Sharp_Final_Project
             srcrect.y = 0;
             dest.x = (int) position.X - dest.w / 2;
             dest.y = (int) position.Y - dest.h / 2;
-            point.x = (int) dest.w/2;
-            point.y = (int) dest.h/2;
+            point.x = dest.w/2;
+            point.y = dest.h/2;
             SDL_RenderCopyEx(Game.Renderer, texture, ref srcrect, ref dest, direction + 90, ref point, SDL_RendererFlip.SDL_FLIP_NONE);
-            
+
+            health.w = (int)healthBar * 6;
+            SDL_SetRenderDrawColor(Game.Renderer, 204, 0, 0, 50); //healthbar
+            SDL_RenderFillRect(Game.Renderer, ref health);
         }
         
     }

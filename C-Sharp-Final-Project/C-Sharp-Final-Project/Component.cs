@@ -39,5 +39,6 @@ namespace C_Sharp_Final_Project
             return Math.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y));
         }
         
+
     }
 }

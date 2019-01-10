@@ -39,7 +39,7 @@ namespace C_Sharp_Final_Project
                     if (tempStrings[0].ToLower().Equals("game"))
                     {
                         Screen.Buttons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
-                            "Textures/startplaceholder.png", () => Screen.StartGame()));
+                            "Textures/Button_Begin.png", () => Screen.StartGame()));
                     }
 
                     break;
@@ -76,7 +76,7 @@ namespace C_Sharp_Final_Project
                     if (Game.Grid.ConvertTileUnitsIntoPixels(tempIndexes[0], tempIndexes[1]) != null)
                     {
                         Game.Enemies.Add(new Enemy(Game.Grid.ConvertTileUnitsIntoPixels(tempIndexes[0], tempIndexes[1]).GetValueOrDefault(), 
-                            32, 32, "Textures/Test2.png"));
+                            32, 32, "Textures/Enemy_Single.png"));
                     } else
                     {
                         Console.WriteLine("Enemy out of bound: " + tempIndexes[0] + "," + tempIndexes[1] + ";" + 

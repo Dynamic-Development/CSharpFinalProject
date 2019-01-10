@@ -6,14 +6,15 @@ namespace C_Sharp_Final_Project
     class Component
     {
         //cool down timer: return false while decrement current time until 0, then reset it to cool down max.
-        public static bool CoolDown(ref int coolDownCurrentTime, int coolDownMax)
+        public static bool CoolDown(ref int coolDownCurrentTime, int coolDownMax, bool autoReset)
         {
             if (coolDownCurrentTime > 0)
             {
                 coolDownCurrentTime--;
             } else
             {
-                coolDownCurrentTime = coolDownMax;
+                if (autoReset)
+                    coolDownCurrentTime = coolDownMax;
                 return true;
             }
             return false;
@@ -33,7 +34,17 @@ namespace C_Sharp_Final_Project
             }
             return false;
         }
-        
+
+        public static bool BoundaryCheck(Vector minPoint, Vector maxPoint, int posX, int posY)
+        {
+            if (posX > minPoint.X && posX < maxPoint.X &&
+                posY > minPoint.Y && posY < maxPoint.Y)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public static double DistanceOfPoints(Vector a, Vector b)
         {
             return Math.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y));

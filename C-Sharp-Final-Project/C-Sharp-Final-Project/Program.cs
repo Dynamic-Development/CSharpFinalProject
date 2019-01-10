@@ -1,4 +1,5 @@
-﻿using static SDL2.SDL;
+﻿using System.Runtime.InteropServices;
+using static SDL2.SDL;
 
 namespace C_Sharp_Final_Project
 {
@@ -6,30 +7,34 @@ namespace C_Sharp_Final_Project
     {
         static void Main(string[] args)
         {
-            Game game = new Game();
 
-            const int FPS = 60;
-            const int frameDelay = 1000 / FPS;
+            Screen main = new Screen();
 
-            uint frameStart = 0;
-            int frameTime = 0;
+            main.Init("2D Top Down Shooter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 900, 600);
 
-            game.Init("2D Game Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 900, 600);
-
-            while (game.Running())
+            while (main.Running())
             {
-                frameStart = SDL_GetTicks();
+                Screen.frameStart = SDL_GetTicks();
 
-                game.HandleEvents();
-                game.Update();
-                game.Render();
+                main.HandleEvents();
+                main.Update();
+                main.Render();
 
-                frameTime = System.Convert.ToInt32(SDL_GetTicks() - frameStart);
-                if (frameDelay > frameTime)
-                    SDL_Delay(System.Convert.ToUInt32(frameDelay - frameTime));
+                try
+                {
+                    Screen.frameTime = System.Convert.ToInt32(SDL_GetTicks() - Screen.frameStart);
+                } catch (System.OverflowException)
+                {
+                    main.Clean();
+                }
+
+                if (Screen.frameDelay > Screen.frameTime)
+                    SDL_Delay(System.Convert.ToUInt32(Screen.frameDelay - Screen.frameTime));
             }
-
-            game.Clean();
+            main.Clean();
         }
     }
 }
+
+
+

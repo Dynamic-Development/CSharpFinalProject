@@ -37,8 +37,7 @@ namespace C_Sharp_Final_Project
             {
                 foreach (Vector point in boundary)
                 {
-                    if (point.X > wall.boundary[0] && point.X < wall.boundary[2] &&
-                        point.Y > wall.boundary[1] && point.Y < wall.boundary[3])
+                    if (Component.BoundaryCheck(wall.boundary[0], wall.boundary[1], point))
                     {
                         collide = true;
                         break;
@@ -55,7 +54,7 @@ namespace C_Sharp_Final_Project
         {
             dest.x = (int)Math.Round(position.X - (dest.w / 2), MidpointRounding.AwayFromZero);
             dest.y = (int)Math.Round(position.Y - (dest.h / 2), MidpointRounding.AwayFromZero);
-            SDL_RenderCopy(Game.Renderer, texture, IntPtr.Zero, ref dest);
+            SDL_RenderCopy(Screen.Renderer, texture, IntPtr.Zero, ref dest);
         }
     }
 }

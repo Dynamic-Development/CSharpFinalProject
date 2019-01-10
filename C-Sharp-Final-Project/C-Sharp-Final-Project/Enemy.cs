@@ -33,7 +33,7 @@ namespace C_Sharp_Final_Project
             objTexture = Texture.LoadTexture(texture);
 
             this.position = position;
-            velocity = new Vector(0, 0);
+            velocity = new Vector();
 
             searchPlayerCoolDown = 0;
             pathPending = false;
@@ -47,9 +47,10 @@ namespace C_Sharp_Final_Project
         public void Update()
         { 
             //finding new path
-            if (Component.CoolDown(ref searchPlayerCoolDown, 50) &&
+            if (Component.CoolDown(ref searchPlayerCoolDown, 50, false) &&
                (targetPosition != Game.Player.position))
             {
+                searchPlayerCoolDown = 50;
                 targetPosition = Game.Player.position;
                 if (!pathPending && 
                     (!Component.DistanceOfPointsLessThan(targetPosition, position, SHOOTING_RANGE) ||
@@ -192,7 +193,7 @@ namespace C_Sharp_Final_Project
         {
             dest.x = (int)Math.Round(position.X - (dest.w / 2), MidpointRounding.AwayFromZero);
             dest.y = (int)Math.Round(position.Y - (dest.h / 2), MidpointRounding.AwayFromZero);
-            SDL_RenderCopy(Game.Renderer, objTexture, IntPtr.Zero, ref dest);
+            SDL_RenderCopy(Screen.Renderer, objTexture, IntPtr.Zero, ref dest);
         }
     }
 }

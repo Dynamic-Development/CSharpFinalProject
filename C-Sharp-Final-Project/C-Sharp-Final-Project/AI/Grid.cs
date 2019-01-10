@@ -38,7 +38,7 @@ namespace C_Sharp_Final_Project
             tileHeight = worldHeight / numTileHeight;
             tileWidth = worldWidth / numTileWidth;
 
-            Vector nodePosition = new Vector(0, 0);
+            Vector nodePosition = new Vector();
             for (int x = 0; x < numNodeWidth; x++) { 
                 nodePosition.X = halfNodeWidth + (nodeWidth * x);
                 for (int y = 0; y < numNodeHeight; y++)
@@ -56,7 +56,7 @@ namespace C_Sharp_Final_Project
         {
             List<Node> neighbors = new List<Node>();
 
-            Vector grid = new Vector(0, 0);
+            Vector grid = new Vector();
             for (int x = -depth; x <= depth; x++)
             {
                 for (int y = -depth; y <= depth; y++)
@@ -153,26 +153,26 @@ namespace C_Sharp_Final_Project
                 rect.x = (int)(node.worldPosition.X - (nodeWidth / 2));
                 rect.y = (int)(node.worldPosition.Y - (nodeHeight / 2));
                 if (node == playerNode) {
-                    SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
+                    SDL_SetRenderDrawColor(Screen.Renderer, 30, 25, 0, 0);
                 }
                 else if (node.path)
                 {
-                    SDL_SetRenderDrawColor(Game.Renderer, 30, 25, 0, 0);
+                    SDL_SetRenderDrawColor(Screen.Renderer, 30, 25, 0, 0);
                 } else if (node.rLevel == 3)
                 {
-                    SDL_SetRenderDrawColor(Game.Renderer, 90, 25, 90, 0);
+                    SDL_SetRenderDrawColor(Screen.Renderer, 90, 25, 90, 0);
                 }
                 else if (node.rLevel == 1) {
-                    SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 0, 0);
+                    SDL_SetRenderDrawColor(Screen.Renderer, 255, 255, 0, 0);
                 }
                 else if (node.walkable)
                 {
-                    SDL_SetRenderDrawColor(Game.Renderer, 0, 0, 0, 0);
+                    SDL_SetRenderDrawColor(Screen.Renderer, 0, 0, 0, 0);
                 } else
                 {
-                    SDL_SetRenderDrawColor(Game.Renderer, 255, 255, 255, 255);
+                    SDL_SetRenderDrawColor(Screen.Renderer, 255, 255, 255, 255);
                 }
-                SDL_RenderFillRect(Game.Renderer, ref rect); //testing
+                SDL_RenderFillRect(Screen.Renderer, ref rect); //testing
             }
         }
     }

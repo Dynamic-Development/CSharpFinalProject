@@ -2,53 +2,50 @@
 using System.Windows;
 using System.Collections.Generic;
 using static SDL2.SDL;
+using System.Runtime.InteropServices;
 
 namespace C_Sharp_Final_Project
 {
     class Game
     {
-        private bool isRunning;
-        private IntPtr window;
-
-        public static IntPtr Renderer;
+        private bool isGameRunning;
         public static Grid Grid;
-        public static int Width;
-        public static int Height;
         public static Pathmaster Pathmanager;
 
         public static bool[] KeyStates = new bool[4];
-        public static List<Tile> Walls = new List<Tile>();
-        public static List<Enemy> Enemies = new List<Enemy>();
-        public static List<Bullet> Bullets = new List<Bullet>();
+        public static List<Tile> Walls;
+        public static List<Enemy> Enemies;
+        public static List<Bullet> Bullets;
         public static Player Player;
         public static int mousePosX;
         public static int mousePosY;
-
+        /*
+        private static int _numkeys;
+        private static IntPtr _keysBuffer;
+        private static byte[] _keysCurr = new byte[(int)SDL_Scancode.SDL_NUM_SCANCODES];
+        private static byte[] _keysPrev = new byte[(int)SDL_Scancode.SDL_NUM_SCANCODES];
+        */
         public Game(){}
         
-        public void Init(string title, int xPos, int yPos, int width, int height)
-        {
-            SDL_WindowFlags flags = 0;
-            Width = width;
-            Height = height;
+        public void Init()
+        {   /*
+            var tmp = _keysPrev;
+            _keysPrev = _keysCurr;
+            _keysCurr = tmp;
+            // copy new state
+            
+            if (_keysCurr[(int) SDL_Scancode.SDL_SCANCODE_W] == 1)
+                
 
-            if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
-            {
-                window = SDL_CreateWindow(title, xPos, yPos, width, height, flags);
-                Renderer = SDL_CreateRenderer(window, -1, 0);
-                SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
-                isRunning = true;
-            }
+            Marshal.Copy(_keysBuffer, _keysCurr, 0, _numkeys);
+            */
+            isGameRunning = true;
+            Walls = new List<Tile>();
+            Enemies = new List<Enemy>();
+            Bullets = new List<Bullet>();
+
             Scene.SetUpScene("Scenes/level1.txt");
             Pathmanager = new Pathmaster();
-
-            Player = new Player(new Vector(200, 300), 56, 36, "Textures/Player.png");
-
-            Enemies = new List<Enemy>
-            {
-                new Enemy(new Vector(200, 100), 32, 32, "Textures/Test2.png"),
-                new Enemy(new Vector(200, 500), 32, 32, "Textures/Test2.png")
-            };
         }
 
         public void HandleEvents()
@@ -57,9 +54,10 @@ namespace C_Sharp_Final_Project
             SDL_PollEvent(out events);
             switch (events.type)
             {
-                case SDL_EventType.SDL_QUIT: isRunning = false; break;
+                case SDL_EventType.SDL_QUIT: Screen.IsRunning = false; break;
                 case SDL_EventType.SDL_KEYDOWN:
                     switch (events.key.keysym.sym) {
+                        case SDL_Keycode.SDLK_ESCAPE: isGameRunning = false; break;
                         case SDL_Keycode.SDLK_w: KeyStates[0] = true; break;
                         case SDL_Keycode.SDLK_a: KeyStates[1] = true; break;
                         case SDL_Keycode.SDLK_s: KeyStates[2] = true; break;
@@ -78,7 +76,7 @@ namespace C_Sharp_Final_Project
                 case SDL_EventType.SDL_MOUSEBUTTONDOWN:
                     Player.Shoot();
                     break;
-                default: isRunning = true; break;
+                default: Screen.IsRunning = true; isGameRunning = true; break;
             }
             SDL_GetMouseState(out mousePosX, out mousePosY);
         }
@@ -92,15 +90,13 @@ namespace C_Sharp_Final_Project
             for (int b = 0; b < Bullets.Count; b++)
                 Bullets[b].Update();
             
-            Pathmanager.TryProcessNext(Component.CoolDown(ref Pathmanager.nextPathCoolDown, 1));
+            Pathmanager.TryProcessNext(Component.CoolDown(ref Pathmanager.nextPathCoolDown, 3, true));
         }
 
         public void Render()
         {
-
-            SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
-            SDL_RenderClear(Renderer);
-
+            SDL_SetRenderDrawColor(Screen.Renderer, 200, 200, 50, 90);
+            SDL_RenderClear(Screen.Renderer);
             //Render Objects
            // Grid.RenderNodes();
             Player.Render();
@@ -110,19 +106,22 @@ namespace C_Sharp_Final_Project
                 Walls[i].Render();
             for (int b = 0; b < Bullets.Count; b++)
                 Bullets[b].Render();
-            SDL_RenderPresent(Renderer);
+
+            SDL_RenderPresent(Screen.Renderer);
         }
 
         public void Clean()
         {
-            SDL_DestroyWindow(window);
-            SDL_DestroyRenderer(Renderer);
-            SDL_Quit();
+            Grid = null;
+            Walls = null;
+            Player = null;
+            Enemies = null;
+            Bullets = null;
         }
 
         public bool Running()
         {
-            return isRunning;
+            return isGameRunning;
         }
     }
 }

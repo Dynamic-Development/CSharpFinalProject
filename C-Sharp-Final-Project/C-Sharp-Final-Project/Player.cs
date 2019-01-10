@@ -6,6 +6,8 @@ namespace C_Sharp_Final_Project
 {
     class Player
     {
+        private const int SPEED = 2;
+
         public Vector position;
         private IntPtr texture;
         private SDL_Rect dest;
@@ -14,49 +16,62 @@ namespace C_Sharp_Final_Project
         public Vector velocity;
         private SDL_Point point;
         private double direction;
-        private int cooldown = 0;
+        private int shootCoolDown = 0;
+        public double healthBar = 32;
+        private SDL_Rect health;
+        private Vector checkNewPosition;
+
         public Player(Vector position, int width, int height, string texturePath)
         {
             this.position = position;
-            velocity = new Vector(0, 0);
+            velocity = new Vector();
             texture = Texture.LoadTexture(texturePath);
 
             srcrect.w = width;
             srcrect.h = height;
             dest.w = width;
             dest.h = height;
+            health.h = 15;
+            health.x = 5;
+            health.y = 5;
         }
         
         public void Shoot()
         {
-            if (Component.CoolDown(ref cooldown, 20))
-            Console.WriteLine("shoot");
-            Game.Bullets.Add(new Bullet(true, position, new Vector(Game.mousePosX, Game.mousePosY), "Textures/PlayerBullet.png"));
+            if (shootCoolDown == 0)
+            {
+                Game.Bullets.Add(new Bullet(true, position, new Vector(Game.mousePosX, Game.mousePosY), "Textures/PlayerBullet.png"));
+                shootCoolDown = 20;
+            }
         }
 
         public void Update()
-        {   
+        {
+            Component.CoolDown(ref shootCoolDown, 20, false);
+
             if (Game.KeyStates[0]) velocity.Y--;
             if (Game.KeyStates[1]) velocity.X--;
             if (Game.KeyStates[2]) velocity.Y++;
             if (Game.KeyStates[3]) velocity.X++;
             bool collide = false;
-            Vector newPosition = position + velocity * 5;
+
+            if (velocity.X != 0 && velocity.Y != 0)
+                velocity *= .7071;
+
+            checkNewPosition = position + velocity * SPEED;
             velocity.X = 0;
             velocity.Y = 0;
 
-            boundary[0] = new Vector(newPosition.X - 15, newPosition.Y - 15);
-            boundary[1] = new Vector(newPosition.X + 15, newPosition.Y + 15);
-            boundary[2] = new Vector(newPosition.X + 15, newPosition.Y - 15);
-            boundary[3] = new Vector(newPosition.X - 15, newPosition.Y + 15);
+            boundary[0] = new Vector(checkNewPosition.X - 15, checkNewPosition.Y - 15);
+            boundary[1] = new Vector(checkNewPosition.X + 15, checkNewPosition.Y + 15);
+            boundary[2] = new Vector(checkNewPosition.X + 15, checkNewPosition.Y - 15);
+            boundary[3] = new Vector(checkNewPosition.X - 15, checkNewPosition.Y + 15);
 
             foreach (Tile wall in Game.Walls)
             {
-                
                 foreach (Vector point in boundary)
                 {
-                    if (point.X > wall.boundary[0].X && point.X < wall.boundary[1].X && 
-                        point.Y > wall.boundary[0].Y && point.Y < wall.boundary[1].Y)
+                    if (Component.BoundaryCheck(wall.boundary[0], wall.boundary[1], point))
                     {
                         collide = true;
                         break;
@@ -65,12 +80,10 @@ namespace C_Sharp_Final_Project
             }
             if (!collide)
             {
-                position = newPosition; 
+                position = checkNewPosition; 
             }
 
             direction = (Math.Atan2(Game.mousePosY - position.Y, Game.mousePosX - position.X)*180)/Math.PI;
-
-
         }
         public void Render()
         {
@@ -78,10 +91,13 @@ namespace C_Sharp_Final_Project
             srcrect.y = 0;
             dest.x = (int) position.X - dest.w / 2;
             dest.y = (int) position.Y - dest.h / 2;
-            point.x = (int) dest.w/2;
-            point.y = (int) dest.h/2;
-            SDL_RenderCopyEx(Game.Renderer, texture, ref srcrect, ref dest, direction + 90, ref point, SDL_RendererFlip.SDL_FLIP_NONE);
-            
+            point.x = dest.w/2;
+            point.y = dest.h/2;
+            SDL_RenderCopyEx(Screen.Renderer, texture, ref srcrect, ref dest, direction + 90, ref point, SDL_RendererFlip.SDL_FLIP_NONE);
+
+            health.w = (int)healthBar * 6;
+            SDL_SetRenderDrawColor(Screen.Renderer, 204, 0, 0, 50); //healthbar
+            SDL_RenderFillRect(Screen.Renderer, ref health);
         }
         
     }

@@ -12,6 +12,7 @@ namespace C_Sharp_Final_Project
         public Vector[][] segments { get; }
         public Vector[] points { get; }
         public int level;
+        public Vector position;
 
         public Tile(int fromXTile, int fromYTile, int toXTile, int toYTile, int level)
         {
@@ -23,6 +24,7 @@ namespace C_Sharp_Final_Project
             { 
                 boundary = new Vector[] {new Vector(Game.Grid.tileWidth * fromXTile, Game.Grid.tileHeight * fromYTile),
                                      new Vector(Game.Grid.tileWidth * (1 + toXTile), Game.Grid.tileHeight * (1 + toYTile))};
+                position = (boundary[0] + boundary[1]) / 2;
 
                 points = new Vector[4];
                 points[0] = boundary[0];
@@ -67,7 +69,7 @@ namespace C_Sharp_Final_Project
             {
                 for (int i = 0; i < objDests.Length; i++)
                 {
-                    SDL_RenderCopy(Game.Renderer, objTexture, IntPtr.Zero, ref objDests[i]);
+                    SDL_RenderCopy(Screen.Renderer, objTexture, IntPtr.Zero, ref objDests[i]);
                 }
             }
             

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows;
 
 namespace C_Sharp_Final_Project
 {
@@ -11,9 +10,45 @@ namespace C_Sharp_Final_Project
         public static void SetUpScene(string sceneFilePath)
         {
             string[] sceneDecode = File.ReadAllLines(sceneFilePath);
-            foreach (string line in sceneDecode)
-                DecodeLineToGame(line);
+
+
+
+            if (sceneDecode[0].ToLower().Equals("game:"))
+            {
+                for (int i = 1; i < sceneDecode.Length; i++)
+                    DecodeLineToGame(sceneDecode[i]);
+            } else if (sceneDecode[0].ToLower().Equals("screen:"))
+            {
+                for (int i = 1; i < sceneDecode.Length; i++)
+                    DecodeLineToScreen(sceneDecode[i]);
+            }
         }
+
+        private static void DecodeLineToScreen(string line)
+        {
+           
+            line = line.Replace(" ", string.Empty);
+            string[] tempStrings;
+
+            switch (line[0])
+            {
+                case 'B':// draw button
+                    line = line.Substring(2);
+                    tempStrings = line.Split(',').ToArray();
+                  
+                    if (tempStrings[0].ToLower().Equals("game"))
+                    {
+                        Screen.Buttons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
+                            "Textures/startplaceholder.png", () => Screen.StartGame()));
+                    }
+
+                    break;
+                default:
+                    Console.WriteLine("Unrecognize symbol for screen: " + line[0]);
+                    break;
+            }
+        }
+
         private static void DecodeLineToGame(string line)
         {
             line = line.Replace(" ", string.Empty);
@@ -24,7 +59,7 @@ namespace C_Sharp_Final_Project
                 case 'L':// Draw Level
                     line = line.Substring(2);
                     tempIndexes = line.Split('x').Select(x => int.Parse(x)).ToArray();
-                    Game.Grid = new Grid(Game.Width, Game.Height, tempIndexes[0], tempIndexes[1]);
+                    Game.Grid = new Grid(Screen.Width, Screen.Height, tempIndexes[0], tempIndexes[1]);
                     Game.Walls.Add(new Tile(0,0, Game.Grid.numTileWidth, Game.Grid.numTileHeight, 3));
                     break;
                 case 'W': //Draw Walls

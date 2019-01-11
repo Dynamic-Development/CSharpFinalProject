@@ -11,14 +11,14 @@ namespace C_Sharp_Final_Project
         public delegate void TaskCallback();
 
         public const int FPS = 60;
-        public static int frameDelay = 1000 / FPS;
+        public int frameDelay = 1000 / FPS;
 
-        public static ulong frameStart = 0;
-        public static int frameTime = 0;
+        public uint frameStart = 0;
+        public int frameTime = 0;
 
         private IntPtr Window;
 
-        public static List<Button> Buttons = new List<Button>();
+        public List<Button> Buttons = new List<Button>();
         public static bool IsRunning;
         public static IntPtr Renderer;
         public static int Width, Height;
@@ -42,7 +42,7 @@ namespace C_Sharp_Final_Project
                 IsRunning = true;
             }
 
-            Scene.SetUpScene("Scenes/main menu.txt");
+            Scene.SetUpSceneScreen("Scenes/main menu.txt", this);
         }
 
         public void HandleEvents()
@@ -68,10 +68,10 @@ namespace C_Sharp_Final_Project
             }
         }
 
-        public static void StartGame()
+        public void StartGame()
         {
             game = new Game();
-            game.Init();
+            game.Init("Scenes/level1.txt");
 
             while (game.Running() && IsRunning)
             {

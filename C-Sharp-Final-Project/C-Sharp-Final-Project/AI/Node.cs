@@ -11,8 +11,6 @@ namespace C_Sharp_Final_Project
         public Node parent;
 
 		public int rLevel; // 0: available; 1: reserved; 2: start point; 3: end point
-		
-        public bool path = false; //testing
 
         public Node(Vector worldPosition, Vector gridPosition, bool walkable)
         {

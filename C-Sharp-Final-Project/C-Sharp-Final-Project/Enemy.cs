@@ -7,15 +7,18 @@ namespace C_Sharp_Final_Project
 {
     class Enemy
     {
-        private const int SPEED = 1; //May subject to change
-        private const int SHOOTING_RANGE = 145;
+        private const double SPEED = 1.5; //May subject to change
+        private const int SHOOTING_RANGE = 200;
+        private const int ACTIVATE_RANGE = 450;
 
         public Vector position;
         public Vector velocity;
         private Vector direction;
-
+        private double degrees;
         private SDL_Rect dest;
-        private IntPtr objTexture;   
+        private IntPtr objTexture;
+        private SDL_Point point;
+        private SDL_Rect srcrect;
 
         private int searchPlayerCoolDown;
         private List<Node> path;
@@ -24,7 +27,9 @@ namespace C_Sharp_Final_Project
         private Vector targetPosition;
 
 		private const int RADIUS_IN_NODES = 2;
-        private int radius;
+        public int radius;
+        private int shootCoolDown;
+        private int healthBar;
 
         //if player goes near enemy, player die
 
@@ -34,86 +39,103 @@ namespace C_Sharp_Final_Project
 
             this.position = position;
             velocity = new Vector();
+            healthBar = 5;
+
+            srcrect.x = 0;
+            srcrect.y = 0;
+            srcrect.w = width;
+            srcrect.h = height;
 
             searchPlayerCoolDown = 0;
+            shootCoolDown = 30;
             pathPending = false;
-			
-			Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 2, RADIUS_IN_NODES);
+
+            Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 2, RADIUS_IN_NODES);
             radius = width / 2;
             dest.w = width;
             dest.h = height;
         }
 
         public void Update()
-        { 
+        {
             //finding new path
-            if (Component.CoolDown(ref searchPlayerCoolDown, 50, false) &&
-               (targetPosition != Game.Player.position))
+            if (healthBar <= 0)
             {
-                searchPlayerCoolDown = 50;
-                targetPosition = Game.Player.position;
-                if (!pathPending && 
-                    (!Component.DistanceOfPointsLessThan(targetPosition, position, SHOOTING_RANGE) ||
-                    Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls)))
+                Death();
+            }
+            else
+            {
+                if (Component.CoolDown(ref searchPlayerCoolDown, 50, false) && targetPosition != Game.Player.position)
                 {
-                    if (path != null)
+                    targetPosition = Game.Player.position;
+
+                    if (Component.DistanceOfPointsLessThan(targetPosition, position, ACTIVATE_RANGE) || path != null)
                     {
-                        foreach (Node node in path)
-                            node.path = false;
-                    }// testing 
-                    if (path != null)
-                    {
-                        for (int i = currentTargetIndex - 1; i < path.Count; i++)
+                        if (!pathPending &&
+                            (!Component.DistanceOfPointsLessThan(targetPosition, position, SHOOTING_RANGE) ||
+                            Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls)))
                         {
-                            if (i >= 0)
-                                Game.Grid.SetLevelGroupNodes(path[i], 0, RADIUS_IN_NODES);
+                            searchPlayerCoolDown = 50;
+                            
+                            if (path != null)
+                            {
+                                for (int i = currentTargetIndex - 1; i < path.Count; i++)
+                                {
+                                    if (i >= 0)
+                                        Game.Grid.SetLevelGroupNodes(path[i], 0, RADIUS_IN_NODES);
+                                }
+                                Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 3, 2);
+                            }
+                            Game.Pathmanager.RequestPath(position, targetPosition, SHOOTING_RANGE, OnPathFound);
+                            pathPending = true;
                         }
-                        Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 3, 2);
                     }
-                    Game.Pathmanager.RequestPath(position, targetPosition, SHOOTING_RANGE, OnPathFound);
-                    pathPending = true;
                 }
-                
-            } else if (path != null)
-            {
-                /*
-                if (Component.DistanceOfPointsLessThan(targetPosition, position, SHOOTING_RANGE) &&
-                    !Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls))
+
+                if (path != null)
                 {
-                    for (int i = currentTargetIndex - 1; i < path.Count; i++)
+                    if (currentTargetIndex < path.Count)
                     {
-                        if (i >= 0)
-                            Game.Grid.SetLevelGroupNodes(path[i], 0, RADIUS_IN_NODES);
-                    }
-                    Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 3, 2);
-                }
-                else
-                {
-                */
-                if (currentTargetIndex < path.Count)
-                {
-                    bool nearAnotherEnemy = false;
-                    foreach (Enemy e in Game.Enemies)
-                    {
-                        if (e != this)
-                            nearAnotherEnemy = Component.DistanceOfPointsLessThan(position, e.position, radius * 2);
-                        if (nearAnotherEnemy)
-                            break;
-                    }
-                    if (!nearAnotherEnemy)
                         position = LocateNextPosition();
-                }
-                else
-                {
-                    if (currentTargetIndex - 1 >= 0)
-                    {
-                        Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, RADIUS_IN_NODES, 1);
+                        degrees = Math.Atan2(direction.Y, direction.X) * 180 / Math.PI;
+
                     }
-                    //shoot bullets
+                    else
+                    {
+                        if (currentTargetIndex - 1 >= 0)
+                        {
+                            Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, RADIUS_IN_NODES, 1);
+
+                        }
+                        degrees = (Math.Atan2(Game.Player.position.Y - position.Y, Game.Player.position.X - position.X) * 180) / Math.PI;
+                        if (!Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls))
+                        {
+                            if (Component.CoolDown(ref shootCoolDown, 30, true))
+                            {
+                                Game.Bullets.Add(new Bullet(false, position, Game.Player.position, "Textures/EnemyBullet.png"));
+                            }
+                        }
+                    }
                 }
-                
-            } 
-            
+            }
+        }
+        
+        public void Hit()
+        {
+            healthBar--;
+        }
+
+        public void Death()
+        {
+            if (path != null)
+            {
+                for (int i = currentTargetIndex - 1; i < path.Count; i++)
+                {
+                    if (i >= 0)
+                        Game.Grid.SetLevelGroupNodes(path[i], 0, RADIUS_IN_NODES);
+                }
+            }
+            Game.Enemies.Remove(this);
         }
 
         private void OnPathFound(List<Node> foundPath, bool found)
@@ -141,7 +163,6 @@ namespace C_Sharp_Final_Project
         private Vector LocateNextPosition()
         {
             Vector newPosition = position;
-            Vector newDirection = direction;
             double incrementSpeed = SPEED;
             double currentDistance;
 
@@ -158,6 +179,7 @@ namespace C_Sharp_Final_Project
                     }
                     if (currentTargetIndex + 1 == path.Count)
                     {
+                        currentTargetIndex++;
                         break;
                     }
                     else
@@ -193,7 +215,11 @@ namespace C_Sharp_Final_Project
         {
             dest.x = (int)Math.Round(position.X - (dest.w / 2), MidpointRounding.AwayFromZero);
             dest.y = (int)Math.Round(position.Y - (dest.h / 2), MidpointRounding.AwayFromZero);
-            SDL_RenderCopy(Screen.Renderer, objTexture, IntPtr.Zero, ref dest);
+
+            point.x = dest.w / 2;
+            point.y = dest.h / 2;
+            SDL_RenderCopyEx(Screen.Renderer, objTexture, ref srcrect, ref dest, degrees + 90, ref point, SDL_RendererFlip.SDL_FLIP_NONE);
+           
         }
     }
 }

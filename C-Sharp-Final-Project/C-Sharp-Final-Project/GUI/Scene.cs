@@ -7,24 +7,29 @@ namespace C_Sharp_Final_Project
 {
     class Scene
     {
-        public static void SetUpScene(string sceneFilePath)
+        public static void SetUpSceneLevel(string sceneFilePath)
         {
             string[] sceneDecode = File.ReadAllLines(sceneFilePath);
-
-
 
             if (sceneDecode[0].ToLower().Equals("game:"))
             {
                 for (int i = 1; i < sceneDecode.Length; i++)
                     DecodeLineToGame(sceneDecode[i]);
-            } else if (sceneDecode[0].ToLower().Equals("screen:"))
+            } 
+        }
+
+        public static void SetUpSceneScreen(string sceneFilePath, Screen main)
+        {
+            string[] sceneDecode = File.ReadAllLines(sceneFilePath);
+
+            if (sceneDecode[0].ToLower().Equals("screen:"))
             {
                 for (int i = 1; i < sceneDecode.Length; i++)
-                    DecodeLineToScreen(sceneDecode[i]);
+                    DecodeLineToScreen(sceneDecode[i], main);
             }
         }
 
-        private static void DecodeLineToScreen(string line)
+        private static void DecodeLineToScreen(string line, Screen main)
         {
            
             line = line.Replace(" ", string.Empty);
@@ -38,8 +43,8 @@ namespace C_Sharp_Final_Project
                   
                     if (tempStrings[0].ToLower().Equals("game"))
                     {
-                        Screen.Buttons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
-                            "Textures/Button_Begin.png", () => Screen.StartGame()));
+                        main.Buttons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
+                            "Textures/Button_Begin.png", () => main.StartGame()));
                     }
 
                     break;
@@ -66,8 +71,7 @@ namespace C_Sharp_Final_Project
                     line = line.Substring(2);
                     tempIndexes = line.Split(',').Select(x => int.Parse(x)).ToArray();
                     Game.Walls.Add(new Tile(tempIndexes[0], tempIndexes[1], tempIndexes[2], tempIndexes[3], 1));
-                    List<Node> unwalkableNodes = Game.Grid.TileNodes(tempIndexes[0], tempIndexes[1], tempIndexes[2], tempIndexes[3], 1);
-                    foreach (Node node in unwalkableNodes)
+                    foreach (Node node in Game.Grid.TileNodes(tempIndexes[0], tempIndexes[1], tempIndexes[2], tempIndexes[3], 1))
                         node.walkable = false;
                     break;
                 case 'E': //Draw Enemy
@@ -76,7 +80,7 @@ namespace C_Sharp_Final_Project
                     if (Game.Grid.ConvertTileUnitsIntoPixels(tempIndexes[0], tempIndexes[1]) != null)
                     {
                         Game.Enemies.Add(new Enemy(Game.Grid.ConvertTileUnitsIntoPixels(tempIndexes[0], tempIndexes[1]).GetValueOrDefault(), 
-                            32, 32, "Textures/Enemy_Single.png"));
+                            64, 64, "Textures/Enemy_Single.png"));
                     } else
                     {
                         Console.WriteLine("Enemy out of bound: " + tempIndexes[0] + "," + tempIndexes[1] + ";" + 

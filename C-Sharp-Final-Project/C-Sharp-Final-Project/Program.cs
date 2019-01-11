@@ -14,7 +14,7 @@ namespace C_Sharp_Final_Project
 
             while (main.Running())
             {
-                Screen.frameStart = SDL_GetTicks();
+                main.frameStart = SDL_GetTicks();
 
                 main.HandleEvents();
                 main.Update();
@@ -22,14 +22,14 @@ namespace C_Sharp_Final_Project
 
                 try
                 {
-                    Screen.frameTime = System.Convert.ToInt32(SDL_GetTicks() - Screen.frameStart);
+                    main.frameTime = System.Convert.ToInt32(SDL_GetTicks() - main.frameStart);
                 } catch (System.OverflowException)
                 {
                     main.Clean();
                 }
 
-                if (Screen.frameDelay > Screen.frameTime)
-                    SDL_Delay(System.Convert.ToUInt32(Screen.frameDelay - Screen.frameTime));
+                if (main.frameDelay > main.frameTime)
+                    SDL_Delay(System.Convert.ToUInt32(main.frameDelay - main.frameTime));
             }
             main.Clean();
         }

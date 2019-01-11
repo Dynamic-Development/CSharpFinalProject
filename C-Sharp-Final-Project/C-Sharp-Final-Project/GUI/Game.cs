@@ -19,32 +19,25 @@ namespace C_Sharp_Final_Project
         public static Player Player;
         public static int mousePosX;
         public static int mousePosY;
-        /*
-        private static int _numkeys;
-        private static IntPtr _keysBuffer;
-        private static byte[] _keysCurr = new byte[(int)SDL_Scancode.SDL_NUM_SCANCODES];
-        private static byte[] _keysPrev = new byte[(int)SDL_Scancode.SDL_NUM_SCANCODES];
-        */
-        public Game(){}
         
-        public void Init()
-        {   /*
-            var tmp = _keysPrev;
-            _keysPrev = _keysCurr;
-            _keysCurr = tmp;
-            // copy new state
-            
-            if (_keysCurr[(int) SDL_Scancode.SDL_SCANCODE_W] == 1)
-                
-
-            Marshal.Copy(_keysBuffer, _keysCurr, 0, _numkeys);
-            */
+        private readonly int numkeys;
+        private readonly IntPtr keysBuffer;
+        private readonly byte[] keysCurr = new byte[(int)SDL_Scancode.SDL_NUM_SCANCODES];
+        private readonly byte[] keysPrev = new byte[(int)SDL_Scancode.SDL_NUM_SCANCODES];
+        
+        public Game()
+        {
             isGameRunning = true;
+            keysBuffer = SDL_GetKeyboardState(out numkeys);
+        }
+        
+        public void Init(string startLevel)
+        {  
             Walls = new List<Tile>();
             Enemies = new List<Enemy>();
             Bullets = new List<Bullet>();
 
-            Scene.SetUpScene("Scenes/level1.txt");
+            Scene.SetUpSceneLevel(startLevel);
             Pathmanager = new Pathmaster();
         }
 
@@ -55,30 +48,26 @@ namespace C_Sharp_Final_Project
             switch (events.type)
             {
                 case SDL_EventType.SDL_QUIT: Screen.IsRunning = false; break;
-                case SDL_EventType.SDL_KEYDOWN:
-                    switch (events.key.keysym.sym) {
-                        case SDL_Keycode.SDLK_ESCAPE: isGameRunning = false; break;
-                        case SDL_Keycode.SDLK_w: KeyStates[0] = true; break;
-                        case SDL_Keycode.SDLK_a: KeyStates[1] = true; break;
-                        case SDL_Keycode.SDLK_s: KeyStates[2] = true; break;
-                        case SDL_Keycode.SDLK_d: KeyStates[3] = true; break;
-                    }
-                    break;
-                case SDL_EventType.SDL_KEYUP:
-                    switch (events.key.keysym.sym)
-                    {
-                        case SDL_Keycode.SDLK_w: KeyStates[0] = false; break;
-                        case SDL_Keycode.SDLK_a: KeyStates[1] = false; break;
-                        case SDL_Keycode.SDLK_s: KeyStates[2] = false; break;
-                        case SDL_Keycode.SDLK_d: KeyStates[3] = false; break;
-                    }
-                    break;
                 case SDL_EventType.SDL_MOUSEBUTTONDOWN:
                     Player.Shoot();
                     break;
                 default: Screen.IsRunning = true; isGameRunning = true; break;
             }
+
+            if (keysCurr[(int)SDL_Scancode.SDL_SCANCODE_W] == 1)
+                Player.velocity.Y--;
+            if (keysCurr[(int)SDL_Scancode.SDL_SCANCODE_A] == 1)
+                Player.velocity.X--;
+            if (keysCurr[(int)SDL_Scancode.SDL_SCANCODE_S] == 1)
+                Player.velocity.Y++;
+            if (keysCurr[(int)SDL_Scancode.SDL_SCANCODE_D] == 1)
+                Player.velocity.X++;
+
+            Marshal.Copy(keysBuffer, keysCurr, 0, numkeys);
+
             SDL_GetMouseState(out mousePosX, out mousePosY);
+
+
         }
 
         public void Update()
@@ -98,15 +87,14 @@ namespace C_Sharp_Final_Project
             SDL_SetRenderDrawColor(Screen.Renderer, 200, 200, 50, 90);
             SDL_RenderClear(Screen.Renderer);
             //Render Objects
-           // Grid.RenderNodes();
-            Player.Render();
-            for (int e = 0; e < Enemies.Count; e++)
-                Enemies[e].Render();
-            for (int i = 0; i < Walls.Count; i++)
-                Walls[i].Render();
+            Grid.RenderNodes();
             for (int b = 0; b < Bullets.Count; b++)
                 Bullets[b].Render();
-
+            for (int i = 0; i < Walls.Count; i++)
+                Walls[i].Render();
+            for (int e = 0; e < Enemies.Count; e++)
+                Enemies[e].Render();
+            Player.Render();
             SDL_RenderPresent(Screen.Renderer);
         }
 

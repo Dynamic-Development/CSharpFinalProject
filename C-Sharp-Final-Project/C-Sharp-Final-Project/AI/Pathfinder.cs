@@ -69,7 +69,7 @@ namespace C_Sharp_Final_Project
                 if (success)
                     RetracePath(startNode, targetNode, distFromTarget);
             }
-            Game.Pathmanager.FinishedrocessingPath(nodePath, success);
+            Game.Pathmanager.FinishedProcessingPath(nodePath, success);
         }
 
         private void RetracePath(Node startNode, Node targetNode, double distFromTarget)
@@ -107,8 +107,6 @@ namespace C_Sharp_Final_Project
                 }
             }
             */
-            foreach (Node node in nodePath)
-                node.path = true; // testing
         }
 
         private int NodeDistance(Node nodea, Node nodeb)

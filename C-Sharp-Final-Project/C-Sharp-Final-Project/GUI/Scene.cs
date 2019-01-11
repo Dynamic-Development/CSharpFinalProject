@@ -43,8 +43,16 @@ namespace C_Sharp_Final_Project
                   
                     if (tempStrings[0].ToLower().Equals("game"))
                     {
-                        main.Buttons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
+                        main.MainButtons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
                             "Textures/Button_Begin.png", () => main.StartGame()));
+                    } else if (tempStrings[0].ToLower().Equals("level"))
+                    {
+                        main.MainButtons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
+                            "Textures/Button_Level.png", () => main.LevelScreen()));
+                    }else if (tempStrings[0].ToLower().Equals("quit"))
+                    {
+                        main.MainButtons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
+                            "Textures/Button_Quit.png", () => main.Clean()));
                     }
 
                     break;

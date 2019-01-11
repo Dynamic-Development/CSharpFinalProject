@@ -1,2 +1,2 @@
 screen:
-B> game, 300, 300
+B> game, 450, 300

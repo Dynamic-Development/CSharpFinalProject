@@ -18,7 +18,8 @@ namespace C_Sharp_Final_Project
 
         private IntPtr Window;
 
-        public List<Button> Buttons = new List<Button>();
+        public List<Button> LevelButtons = new List<Button>();
+        public List<Button> MainButtons = new List<Button>();
         public static bool IsRunning;
         public static IntPtr Renderer;
         public static int Width, Height;
@@ -54,8 +55,11 @@ namespace C_Sharp_Final_Project
             switch (events.type)
             {
                 case SDL_EventType.SDL_QUIT: IsRunning = false; break;
+                case SDL_EventType.SDL_KEYDOWN:
+                    if (e.key.keysym.sym)
+                        break;
                 case SDL_EventType.SDL_MOUSEBUTTONDOWN:
-                    foreach(Button button in Buttons)
+                    foreach(Button button in MainButtons)
                     {
                         if (Component.BoundaryCheck(button.boundary[0], button.boundary[1], mouseX, mouseY))
                         {
@@ -89,6 +93,32 @@ namespace C_Sharp_Final_Project
             game.Clean();
         }
 
+        public void LevelScreen()
+        {
+            MainButtons = LevelButtons;
+        }
+
+        public void SelectLevel(string level)
+        {
+            game = new Game();
+            game.Init(level);
+
+            while (game.Running() && IsRunning)
+            {
+                frameStart = SDL_GetTicks();
+
+                game.HandleEvents();
+                game.Update();
+                game.Render();
+
+                frameTime = Convert.ToInt32(SDL_GetTicks() - frameStart);
+                if (frameDelay > frameTime)
+                    SDL_Delay(Convert.ToUInt32(frameDelay - frameTime));
+            }
+
+            game.Clean();
+        }
+
         public void Update()
         {
             if (!IsRunning)
@@ -100,7 +130,7 @@ namespace C_Sharp_Final_Project
             SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
             SDL_RenderClear(Renderer);
 
-            foreach (Button button in Buttons)
+            foreach (Button button in MainButtons)
                 button.Render();
           
             SDL_RenderPresent(Renderer);

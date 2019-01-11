@@ -39,8 +39,6 @@ namespace C_Sharp_Final_Project
             points[2] = boundary[1];
             points[3] = new Vector(boundary[0].X, boundary[1].Y);
 
-            
-
             segments = new Vector[4][];
             segments[0] = new Vector[] { points[0], points[1] };
             segments[1] = new Vector[] { points[1], points[2] };

@@ -155,10 +155,7 @@ namespace C_Sharp_Final_Project
                 if (node == playerNode) {
                     SDL_SetRenderDrawColor(Screen.Renderer, 30, 25, 0, 0);
                 }
-                else if (node.path)
-                {
-                    SDL_SetRenderDrawColor(Screen.Renderer, 30, 25, 0, 0);
-                } else if (node.rLevel == 3)
+                else if (node.rLevel == 3)
                 {
                     SDL_SetRenderDrawColor(Screen.Renderer, 90, 25, 90, 0);
                 }

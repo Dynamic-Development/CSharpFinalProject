@@ -36,7 +36,7 @@ namespace C_Sharp_Final_Project
             }
         }
 
-        public void FinishedrocessingPath(List<Node> nodePath, bool success)
+        public void FinishedProcessingPath(List<Node> nodePath, bool success)
         {
             currentPathRequest.callback(nodePath, success);
             isProcessingPath = false;

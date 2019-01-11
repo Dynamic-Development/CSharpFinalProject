@@ -12,9 +12,13 @@ namespace C_Sharp_Final_Project
         private IntPtr texture;
         private Vector[] boundary = new Vector[4];
         private Vector direction;
-        
+        private Vector newPosition;
+        private bool playerBullet;
+
         public Bullet(bool playerBullet, Vector position, Vector targetpos, string texture)
         {
+            this.playerBullet = playerBullet;
+
             double distance = Component.DistanceOfPoints(position, targetpos);
             this.position = position;
             direction = (targetpos - position) / distance;
@@ -26,28 +30,46 @@ namespace C_Sharp_Final_Project
         
         public void Update()
         {
-            bool collide = false;
-            Vector newPosition = position + velocity * 5;
-            boundary[0] = new Vector(newPosition.X - 8, newPosition.Y - 8);
-            boundary[1] = new Vector(newPosition.X + 8, newPosition.Y + 8);
-            boundary[2] = new Vector(newPosition.X + 8, newPosition.Y - 8);
-            boundary[3] = new Vector(newPosition.X - 8, newPosition.Y + 8);
+            newPosition = position + velocity * 5;
 
-            foreach (Tile wall in Game.Walls)
-            {
-                foreach (Vector point in boundary)
+            if (playerBullet) {
+                for (int i = 0; i < Game.Enemies.Count; i++)
                 {
-                    if (Component.BoundaryCheck(wall.boundary[0], wall.boundary[1], point))
+                    if (Component.DistanceOfPointsLessThan(Game.Enemies[i].position, position, Game.Enemies[i].radius + 8))
                     {
-                        collide = true;
+                        Game.Enemies[i].Hit();
+                        Game.Bullets.Remove(this);
+                    }
+                }
+            } else
+            {
+                if (Component.DistanceOfPointsLessThan(Game.Player.position, position, Game.Player.radius + 8))
+                {
+                    Game.Player.Hit();
+                    Game.Bullets.Remove(this);
+                }
+            }
+
+            for(int i = 0; i < Game.Walls.Count; i++)
+            {
+                if (Game.Walls[i].level == 3)
+                {
+                    if (Component.ScreenCollision(position))
+                    {
+                        newPosition = position;
+                        Game.Bullets.Remove(this);
                         break;
                     }
                 }
+                else if (Component.BulletWallCollision(Game.Walls[i], position))
+                {
+                    newPosition = position;
+                    Game.Bullets.Remove(this);
+                    break;
+                }
             }
-            if (!collide)
-            {
-                position = newPosition;
-            }
+            position = newPosition;
+           
         }
 
         public void Render()

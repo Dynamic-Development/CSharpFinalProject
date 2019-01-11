@@ -21,25 +21,22 @@ namespace C_Sharp_Final_Project
             return false;
         }
 
-        public static double[] Cast(Vector fromPoint, Vector toPoint, List<Tile> walls) 
+        public static Vector Cast(Vector fromPoint, Vector toPoint, Tile wall)
         {
-            double[] closestIntersect = null;
-            double[] currentIntersect;
-            foreach (Tile wall in walls)
+            Vector? currentIntersect = null;
+            for (int i = 0; i < wall.segments.Length; i++)
             {
-                foreach(Vector[] segment in wall.segments)
+                currentIntersect = findIntersection(fromPoint, toPoint, wall.segments[i][0], wall.segments[i][1]);
+                if (currentIntersect != null)
                 {
-                    currentIntersect = findIntersection(fromPoint, toPoint, segment[0], segment[1]);
-                    if (currentIntersect == null)
-                        continue;
-                    else if(closestIntersect == null || currentIntersect[2] < closestIntersect[2])
-                        closestIntersect = currentIntersect;
+                    break;
                 }
             }
-            return closestIntersect;
+
+            return currentIntersect ?? default(Vector);
         }
 
-        private static double[] findIntersection(Vector lineRA, Vector lineRB, Vector lineSA, Vector lineSB)
+        private static Vector? findIntersection(Vector lineRA, Vector lineRB, Vector lineSA, Vector lineSB)
         {
             Vector rayPoint = lineRA;
             Vector rayDist = lineRB - lineRA;
@@ -64,7 +61,7 @@ namespace C_Sharp_Final_Project
             if (t1 < 0)
                 return null;
 
-            return new double[] { rayPoint.X + rayDist.X * t1, rayPoint.Y + rayDist.Y * t1, t1 };
+            return new Vector(rayPoint.X + rayDist.X * t1, rayPoint.Y + rayDist.Y * t1);
         }
 
         private static bool onSegment(Vector q, Vector r, Vector p)

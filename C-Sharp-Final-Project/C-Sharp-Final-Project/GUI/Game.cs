@@ -108,7 +108,8 @@ namespace C_Sharp_Final_Project
                 Walls = new List<Tile>();
                 Enemies = new List<Enemy>();
                 Bullets = new List<Bullet>();
-
+                Grid = new Grid(Screen.Width, Screen.Height, 30, 20);
+                Walls.Add(new Tile(0, 0, Grid.numTileWidth, Grid.numTileHeight, 3));
                 Scene.SetUpSceneLevel(levels[currentLevelIndex]);
                 return false;
             }

@@ -87,6 +87,28 @@ namespace C_Sharp_Final_Project
             return Math.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y));
         }
         
+        public static string ChooseRandomWallType()
+        {
+            Random rs = new Random();
+            int rn = rs.Next(0, 10);
+            if (rn <= 3)
+                return "Textures/BrickWall_Base.png";
+            else if (rn <= 4)
+                return "Textures/BrickWall_Variant.png";
+            else if (rn <= 8)
+                return "Textures/BrickWall_Window.png";
+            return "Textures/BrickWall_Hole.png";
+        }
 
+        public static byte ChooseRandomEnemyType()
+        {
+            Random rs = new Random();
+            int rn = rs.Next(0, 9);
+            if (rn <= 3)
+                return 1;
+            if (rn <= 7)
+                return 2;
+            return 3;
+        }
     }
 }

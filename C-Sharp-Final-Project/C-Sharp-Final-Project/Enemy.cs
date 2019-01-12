@@ -7,9 +7,9 @@ namespace C_Sharp_Final_Project
 {
     class Enemy
     {
-        private const double SPEED = 1.5; //May subject to change
-        private const int SHOOTING_RANGE = 200;
-        private const int ACTIVATE_RANGE = 450;
+        private double SPEED;
+        private int SHOOTING_RANGE;
+        private const int ACTIVATE_RANGE = 500;
 
         public Vector position;
         public Vector velocity;
@@ -28,18 +28,25 @@ namespace C_Sharp_Final_Project
 
 		private const int RADIUS_IN_NODES = 2;
         public int radius;
+        private int maxReloadBuffer;
         private int shootCoolDown;
         private int healthBar;
-
+        private int damage;
+        public byte type;
         //if player goes near enemy, player die
 
-        public Enemy(Vector position, int width, int height, string texture)
+        public Enemy(Vector position, int width, int height, byte type)
         {
-            objTexture = Texture.LoadTexture(texture);
+            if (type == 1) objTexture = Texture.LoadTexture("Textures/Enemy_Single.png");
+            else if (type == 2) objTexture = Texture.LoadTexture("Textures/Enemy_Double.png");
+            else if (type == 3) objTexture = Texture.LoadTexture("Textures/Enemy_Bomber.png");
+
+            this.type = type;
+
+            BehaviorSet();
 
             this.position = position;
             velocity = new Vector();
-            healthBar = 5;
 
             srcrect.x = 0;
             srcrect.y = 0;
@@ -47,13 +54,42 @@ namespace C_Sharp_Final_Project
             srcrect.h = height;
 
             searchPlayerCoolDown = 0;
-            shootCoolDown = 30;
             pathPending = false;
 
+            degrees = (Math.Atan2(Game.Player.position.Y - position.Y, Game.Player.position.X - position.X) * 180) / Math.PI;
+            shootCoolDown = maxReloadBuffer;
+
             Game.Grid.SetLevelGroupNodes(Game.Grid.NodeFromWorld(position), 2, RADIUS_IN_NODES);
-            radius = width / 2;
+            radius = 30;
             dest.w = width;
             dest.h = height;
+        }
+
+        private void BehaviorSet()
+        {
+            if (type == 1)
+            {
+                SHOOTING_RANGE = 500;
+                healthBar = 15;
+                SPEED = 1.3;
+                damage = 2;
+                maxReloadBuffer = 15;
+            } else if (type == 2)
+            {
+                SHOOTING_RANGE = 410;
+                healthBar = 20;
+                SPEED = 1.5;
+                damage = 1;
+                maxReloadBuffer = 10;
+            } else if (type == 3)
+            {
+                SHOOTING_RANGE = 0;
+                healthBar = 35;
+                SPEED = 2.5;
+                damage = 12;
+                maxReloadBuffer = 0;
+            }
+
         }
 
         public void Update()
@@ -99,27 +135,61 @@ namespace C_Sharp_Final_Project
                         position = LocateNextPosition();
                         degrees = Math.Atan2(direction.Y, direction.X) * 180 / Math.PI;
 
+                        if (type == 3 && Component.DistanceOfPointsLessThan(position, Game.Player.position, Game.Player.radius + radius))
+                        {
+                            Game.Player.healthBar -= damage;
+                            Death();
+                        }
                     }
                     else
                     {
-                        if (currentTargetIndex - 1 >= 0)
+                        if (currentTargetIndex >= 0)
                         {
-                            Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, RADIUS_IN_NODES, 1);
-
+                            //Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 0, RADIUS_IN_NODES, 1);
+                            Game.Grid.SetLevelGroupNodes(path[currentTargetIndex - 1], 3, RADIUS_IN_NODES, 1);
                         }
                         degrees = (Math.Atan2(Game.Player.position.Y - position.Y, Game.Player.position.X - position.X) * 180) / Math.PI;
-                        if (!Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls))
-                        {
-                            if (Component.CoolDown(ref shootCoolDown, 30, true))
-                            {
-                                Game.Bullets.Add(new Bullet(false, position, Game.Player.position, "Textures/EnemyBullet.png"));
-                            }
-                        }
+                        DamageBehavior();
                     }
                 }
             }
         }
-        
+
+        public void DamageBehavior()
+        {
+            if (type == 1)
+            {
+                if (!Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls))
+                {
+                    if (Component.CoolDown(ref shootCoolDown, maxReloadBuffer, true))
+                    {
+                        Game.Bullets.Add(new Bullet(false, position, Game.Player.position, "Textures/EnemyBullet.png", damage));
+                    }
+                }
+            } else if (type == 3)
+            {
+                if(Component.DistanceOfPointsLessThan(position, Game.Player.position, Game.Player.radius + radius))
+                {
+                    Game.Player.Hit(damage);
+                    Death();
+                }
+            } else if (type == 2)
+            {
+                if (!Raycaster.AreWallsBlockView(targetPosition, position, Game.Walls))
+                {
+                    if (Component.CoolDown(ref shootCoolDown, maxReloadBuffer, true))
+                    {
+                        double r = (degrees * Math.PI) / 180;
+                        double pX = Math.Sin(r);
+                        double pY = Math.Cos(r);
+                        Game.Bullets.Add(new Bullet(false, position + new Vector(pX * 27, pY * 27), Game.Player.position, "Textures/EnemyBullet.png", damage));
+                        Game.Bullets.Add(new Bullet(false, position + new Vector(pX * -27, pY * -27), Game.Player.position, "Textures/EnemyBullet.png", damage));
+                    }
+                }
+            }
+
+        }
+
         public void Hit()
         {
             healthBar--;
@@ -137,6 +207,8 @@ namespace C_Sharp_Final_Project
             }
             Game.Enemies.Remove(this);
         }
+
+
 
         private void OnPathFound(List<Node> foundPath, bool found)
         {

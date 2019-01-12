@@ -1,0 +1,6 @@
+screen:
+B> level1, 450, 100
+B> level2, 450, 200
+B> level3, 450, 300
+B> level4, 450, 400
+B> level5, 450, 500

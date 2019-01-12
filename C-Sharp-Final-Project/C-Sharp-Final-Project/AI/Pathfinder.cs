@@ -21,7 +21,7 @@ namespace C_Sharp_Final_Project
                 Heap<Node> openSet = new Heap<Node>(Game.Grid.numNodeHeight * Game.Grid.numNodeWidth);
                 HashSet<Node> closedSet = new HashSet<Node>();
                 openSet.Add(startNode);
-
+                
                 while (openSet.Count > 0)
                 {
                     Node currentNode = openSet.RemoveFirst();
@@ -36,14 +36,14 @@ namespace C_Sharp_Final_Project
                     foreach (Node neighbor in Game.Grid.PossibleNodeNeighbors(currentNode, 1))
                     {
 
-                        if (closedSet.Contains(neighbor) || neighbor.rLevel != 0 || 
+                        if (closedSet.Contains(neighbor) || neighbor.rLevel != 0 ||
                             !neighbor.walkable || neighbor.rLevel == 3 || neighbor.rLevel == 1)
                             continue;
                         else
                         {
                             bool neighborNodeUnavailable = false;
                             foreach (Node subNeighbor in Game.Grid.PossibleNodeNeighbors(currentNode, 2))
-                                if (subNeighbor.rLevel != 0 || !subNeighbor.walkable || 
+                                if (subNeighbor.rLevel != 0 || !subNeighbor.walkable ||
                                     neighbor.rLevel == 3 || neighbor.rLevel == 1)
                                 {
                                     neighborNodeUnavailable = true;
@@ -66,7 +66,15 @@ namespace C_Sharp_Final_Project
                         }
                     }
                 }
-                if (success)
+                if (!success) {
+                    openSet = new Heap<Node>(closedSet.Count);
+                    foreach (Node node in closedSet)
+                    {
+                        openSet.Add(node);
+                    }
+                    RetracePath(startNode, openSet.RemoveFirst(), distFromTarget);
+                }
+                else
                     RetracePath(startNode, targetNode, distFromTarget);
             }
             Game.Pathmanager.FinishedProcessingPath(nodePath, success);

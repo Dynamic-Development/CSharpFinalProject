@@ -143,7 +143,7 @@ namespace C_Sharp_Final_Project
             Drawing a player: P> x, y
             Drawing a wall: W> topleftx, toplefty, bottomrightx, bottomrighty
             Drawing an enemy: E> x, y
-            
+            Drawing a goal: G> x, y
         */
     }
 }

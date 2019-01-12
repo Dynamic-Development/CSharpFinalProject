@@ -17,7 +17,7 @@ namespace C_Sharp_Final_Project
         private SDL_Point point;
         private double direction;
         private int shootCoolDown = 0;
-        public double healthBar = 32;
+        public double healthBar = 30;
         private SDL_Rect health;
         private Vector checkNewPosition;
         public int radius;
@@ -36,7 +36,7 @@ namespace C_Sharp_Final_Project
             dest.w = width;
             dest.h = height;
 
-            radius = 32;
+            radius = 30;
 
             health.h = 15;
             health.x = 5;
@@ -47,8 +47,8 @@ namespace C_Sharp_Final_Project
         {
             if (shootCoolDown == 0)
             {
-                Game.Bullets.Add(new Bullet(true, position, new Vector(Game.mousePosX, Game.mousePosY), "Textures/PlayerBullet.png"));
-                shootCoolDown = 10;
+                Game.Bullets.Add(new Bullet(true, position, new Vector(Game.mousePosX, Game.mousePosY), "Textures/PlayerBullet.png", 1));
+                shootCoolDown = 8;
             }
         }
 
@@ -65,7 +65,16 @@ namespace C_Sharp_Final_Project
 
             foreach (Tile wall in Game.Walls)
             {
-                if (wall.level == 3)
+                if (wall.level == 5)
+                {
+                    if(Component.WallCollision(wall, checkNewPosition, 16))
+                    {
+                        Game.nextLevelPend = true;
+                        checkNewPosition = position;
+                        break;
+                    }
+                }
+                else if (wall.level == 3)
                 {
                     if (Component.ScreenCollision(checkNewPosition, 16))
                     {
@@ -79,7 +88,7 @@ namespace C_Sharp_Final_Project
                         }
                         break;
                     }
-                }
+                } 
                 else if (Component.WallCollision(wall, checkNewPosition, 16))
                 {
                     if (Component.WallCollision(wall, new Vector(checkNewPosition.X, position.Y), 16))
@@ -90,18 +99,32 @@ namespace C_Sharp_Final_Project
                 }
             }
 
+            for(int i = 0; i < Game.Enemies.Count; i++)
+            {
+                if (Game.Enemies[i].type != 3 && Component.DistanceOfPointsLessThan(Game.Enemies[i].position, position, radius + Game.Enemies[i].radius))
+                {
+                    Death();
+                    break;
+                }
+            }
+            
+            if(healthBar <= 0)
+            {
+                Death();
+            }
+
             position = checkNewPosition; 
             direction = (Math.Atan2(Game.mousePosY - position.Y, Game.mousePosX - position.X)*180)/Math.PI;
         }
 
-        public void Hit()
+        public void Hit(int damage)
         {
-            healthBar -= 3;
+            healthBar -= damage;
         }
 
         public void Death()
         {
-
+            Game.playerDeath = true;
         }
 
         public void Render()

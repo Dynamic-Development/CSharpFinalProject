@@ -103,7 +103,7 @@ namespace C_Sharp_Final_Project
         public bool NextLevel()
         {
             currentLevelIndex++;
-            if (currentLevelIndex < 1)
+            if (currentLevelIndex < levels.Length)
             {
                 Walls = new List<Tile>();
                 Enemies = new List<Enemy>();

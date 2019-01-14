@@ -118,7 +118,7 @@ namespace C_Sharp_Final_Project
                     line = line.Substring(2);
                     tempIndexes = line.Split(',').Select(x => int.Parse(x)).ToArray();
 
-                    Game.Walls.Add(new Tile(17, 17, 17, 17, 5));
+                    Game.Walls.Add(new Tile(tempIndexes[0], tempIndexes[1], tempIndexes[0], tempIndexes[1], 5));
 
                     break;
                 default:

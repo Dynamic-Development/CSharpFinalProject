@@ -138,11 +138,11 @@ namespace C_Sharp_Final_Project
 
         public void Render()
         {
-            SDL_SetRenderDrawColor(Screen.Renderer, 200, 200, 50, 90);
+            SDL_SetRenderDrawColor(Screen.Renderer, 32, 32, 32, 90);
             SDL_RenderClear(Screen.Renderer);
             //Render Objects
 
-            Grid.RenderNodes();
+            //Grid.RenderNodes();
 
             for (int b = 0; b < Bullets.Count; b++)
                 Bullets[b].Render();

@@ -139,7 +139,7 @@ namespace C_Sharp_Final_Project
             game = new Game();
             game.Init("Scenes/" +  level, levels);
 
-            while (game.Running() && IsRunning && !game.win)
+            while (game.Running() && IsRunning && !game.win && !game.isPlayerDeadYet())
             {
                 frameStart = SDL_GetTicks();
 
@@ -195,7 +195,7 @@ namespace C_Sharp_Final_Project
 
         public void Render()
         {
-            SDL_SetRenderDrawColor(Renderer, 200, 200, 50, 90);
+            SDL_SetRenderDrawColor(Renderer, 32, 32, 32, 90);
             SDL_RenderClear(Renderer);
             if (!endScene)
             {

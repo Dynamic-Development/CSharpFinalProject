@@ -5,3 +5,5 @@
 * Playthrough: https://www.youtube.com/watch?v=hKPNDB3E0bQ
 * Code: https://www.youtube.com/watch?v=eNLgyy8NX2w
 
+## Flowchart
+![flowchart](https://github.com/Dynamic-Development/CSharpFinalProject/blob/master/Game%20Flowchart-1.png)

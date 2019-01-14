@@ -10,7 +10,7 @@ namespace C_Sharp_Final_Project
 
             Screen main = new Screen();
 
-            main.Init("2D Top Down Shooter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 900, 600);
+            main.Init("Space Mafia - Attack of the Mafia", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 900, 600);
 
             while (main.Running())
             {

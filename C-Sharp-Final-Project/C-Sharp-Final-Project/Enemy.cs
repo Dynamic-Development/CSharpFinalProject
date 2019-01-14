@@ -101,7 +101,7 @@ namespace C_Sharp_Final_Project
             }
             else
             {
-                if (Component.CoolDown(ref searchPlayerCoolDown, 50, false) && targetPosition != Game.Player.position && 
+                if (Component.CoolDown(ref searchPlayerCoolDown, 20, false) && targetPosition != Game.Player.position && 
                     Game.Grid.NodeFromWorld(Game.Player.position).walkable && Game.Grid.NodeFromWorld(Game.Player.position).rLevel == 0)
                 {
                     targetPosition = Game.Player.position;

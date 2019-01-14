@@ -9,7 +9,7 @@ namespace C_Sharp_Final_Project
     {
         private double SPEED;
         private int SHOOTING_RANGE;
-        private const int ACTIVATE_RANGE = 500;
+        private const int ACTIVATE_RANGE = 800;
 
         public Vector position;
         public Vector velocity;
@@ -69,14 +69,14 @@ namespace C_Sharp_Final_Project
         {
             if (type == 1)
             {
-                SHOOTING_RANGE = 500;
+                SHOOTING_RANGE = 600;
                 healthBar = 15;
                 SPEED = 1.3;
                 damage = 2;
                 maxReloadBuffer = 15;
             } else if (type == 2)
             {
-                SHOOTING_RANGE = 410;
+                SHOOTING_RANGE = 600;
                 healthBar = 20;
                 SPEED = 1.5;
                 damage = 1;
@@ -101,7 +101,8 @@ namespace C_Sharp_Final_Project
             }
             else
             {
-                if (Component.CoolDown(ref searchPlayerCoolDown, 50, false) && targetPosition != Game.Player.position)
+                if (Component.CoolDown(ref searchPlayerCoolDown, 50, false) && targetPosition != Game.Player.position && 
+                    Game.Grid.NodeFromWorld(Game.Player.position).walkable && Game.Grid.NodeFromWorld(Game.Player.position).rLevel == 0)
                 {
                     targetPosition = Game.Player.position;
 

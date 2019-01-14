@@ -86,7 +86,6 @@ namespace C_Sharp_Final_Project
                         {
                             checkNewPosition.Y = position.Y;
                         }
-                        break;
                     }
                 } 
                 else if (Component.WallCollision(wall, checkNewPosition, 16))
@@ -107,7 +106,7 @@ namespace C_Sharp_Final_Project
                     break;
                 }
             }
-            
+            Console.WriteLine(healthBar);
             if(healthBar <= 0)
             {
                 Death();

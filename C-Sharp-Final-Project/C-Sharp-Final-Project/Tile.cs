@@ -6,12 +6,12 @@ namespace C_Sharp_Final_Project
 {
     class Tile
     {
-        private IntPtr objTexture;
+        private IntPtr[] objTexture;
         private SDL_Rect[] objDests;
         public Vector[] boundary { get; }
         public Vector[][] segments { get; }
         public Vector[] points { get; }
-        public int level;
+        public int level; // 1 is wall; 2 is floor; 3 is screen; 5 is goal
         public Vector corner;
         public int width, height;
 
@@ -26,7 +26,11 @@ namespace C_Sharp_Final_Project
             
             this.level = level;
 
-            if (level == 1) objTexture = Texture.LoadTexture("Textures/BrickWall_Base.png");
+            if (level == 5)
+            {
+                objTexture = new IntPtr[1];
+                objTexture[0] = Texture.LoadTexture("Textures/WinPenent.png");
+            }
 
             boundary = new Vector[] {new Vector(Game.Grid.tileWidth * fromXTile, Game.Grid.tileHeight * fromYTile),
                                     new Vector(Game.Grid.tileWidth * (1 + toXTile), Game.Grid.tileHeight * (1 + toYTile))};
@@ -39,8 +43,6 @@ namespace C_Sharp_Final_Project
             points[2] = boundary[1];
             points[3] = new Vector(boundary[0].X, boundary[1].Y);
 
-            
-
             segments = new Vector[4][];
             segments[0] = new Vector[] { points[0], points[1] };
             segments[1] = new Vector[] { points[1], points[2] };
@@ -49,29 +51,48 @@ namespace C_Sharp_Final_Project
 
             objDests = new SDL_Rect[(widthTiles + 1) * (heightTiles + 1)];
 
-            int tempIndex = 0;
-            for (int x = fromXTile; x <= toXTile; x++)
+            if (level == 5)
             {
-                for (int y = fromYTile; y <= toYTile; y++)
+                int tempIndex = 0;
+                for (int x = fromXTile; x <= toXTile; x++)
                 {
-                    objDests[tempIndex].w = Game.Grid.tileWidth;
-                    objDests[tempIndex].h = Game.Grid.tileHeight;
-                    objDests[tempIndex].x = Game.Grid.tileWidth * x;
-                    objDests[tempIndex].y = Game.Grid.tileHeight * y;
-                    tempIndex++;
+                    for (int y = fromYTile; y <= toYTile; y++)
+                    {
+                        objDests[tempIndex].w = Game.Grid.tileWidth;
+                        objDests[tempIndex].h = Game.Grid.tileHeight;
+                        objDests[tempIndex].x = Game.Grid.tileWidth * x;
+                        objDests[tempIndex].y = Game.Grid.tileHeight * y;
+                        tempIndex++;
+                    }
+                }
+            } else if (level == 1)
+            {
+                objTexture = new IntPtr[(widthTiles + 1) * (heightTiles + 1)];
+                int tempIndex = 0;
+                for (int x = fromXTile; x <= toXTile; x++)
+                {
+                    for (int y = fromYTile; y <= toYTile; y++)
+                    {
+                        objTexture[tempIndex] = Texture.LoadTexture(Component.ChooseRandomWallType());
+                        objDests[tempIndex].w = Game.Grid.tileWidth;
+                        objDests[tempIndex].h = Game.Grid.tileHeight;
+                        objDests[tempIndex].x = Game.Grid.tileWidth * x;
+                        objDests[tempIndex].y = Game.Grid.tileHeight * y;
+                        tempIndex++;
+                    }
                 }
             }
-
-            Console.WriteLine(objDests[0].w);
         }
 
         public void Render()
         {
-            if (level == 1 || level == 2)
+            if (level == 1 || 
+                level == 2 || 
+                level == 5)
             {
                 for (int i = 0; i < objDests.Length; i++)
                 {
-                    SDL_RenderCopy(Screen.Renderer, objTexture, IntPtr.Zero, ref objDests[i]);
+                    SDL_RenderCopy(Screen.Renderer, objTexture[i], IntPtr.Zero, ref objDests[i]);
                 }
             }
             

@@ -1,2 +1,4 @@
 screen:
-B> game, 300, 300
+B> game, 450, 200
+B> level, 450, 300
+B> quit, 450, 400

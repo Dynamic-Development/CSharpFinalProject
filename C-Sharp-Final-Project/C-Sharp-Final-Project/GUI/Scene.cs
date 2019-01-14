@@ -43,8 +43,20 @@ namespace C_Sharp_Final_Project
                   
                     if (tempStrings[0].ToLower().Equals("game"))
                     {
-                        main.Buttons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
+                        main.MainButtons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
                             "Textures/Button_Begin.png", () => main.StartGame()));
+                    } else if (tempStrings[0].ToLower().Equals("level"))
+                    {
+                        main.MainButtons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
+                            "Textures/Button_Level.png", () => main.LevelScreen()));
+                    } else if (tempStrings[0].ToLower().Equals("quit"))
+                    {
+                        main.MainButtons.Add(new Button(200, 50, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
+                            "Textures/Button_Quit.png", () => main.Clean()));
+                    } else
+                    {
+                        main.MainButtons.Add(new Button(75, 75, int.Parse(tempStrings[1]), int.Parse(tempStrings[2]),
+                            "Textures/Button_" + tempStrings[0] + ".png", () => main.LoadLevel(tempStrings[0] + ".txt")));
                     }
 
                     break;
@@ -65,7 +77,7 @@ namespace C_Sharp_Final_Project
                     line = line.Substring(2);
                     tempIndexes = line.Split('x').Select(x => int.Parse(x)).ToArray();
                     Game.Grid = new Grid(Screen.Width, Screen.Height, tempIndexes[0], tempIndexes[1]);
-                    Game.Walls.Add(new Tile(0,0, Game.Grid.numTileWidth, Game.Grid.numTileHeight, 3));
+                    Game.Walls.Add(new Tile(0, 0, Game.Grid.numTileWidth, Game.Grid.numTileHeight, 3));
                     break;
                 case 'W': //Draw Walls
                     line = line.Substring(2);
@@ -80,7 +92,7 @@ namespace C_Sharp_Final_Project
                     if (Game.Grid.ConvertTileUnitsIntoPixels(tempIndexes[0], tempIndexes[1]) != null)
                     {
                         Game.Enemies.Add(new Enemy(Game.Grid.ConvertTileUnitsIntoPixels(tempIndexes[0], tempIndexes[1]).GetValueOrDefault(), 
-                            64, 64, "Textures/Enemy_Single.png"));
+                            64, 64, Component.ChooseRandomEnemyType()));
                     } else
                     {
                         Console.WriteLine("Enemy out of bound: " + tempIndexes[0] + "," + tempIndexes[1] + ";" + 
@@ -101,6 +113,12 @@ namespace C_Sharp_Final_Project
                         Console.WriteLine("Player out of bound: " + tempIndexes[0] + "," + tempIndexes[1] + ";" +
                             Game.Grid.numTileWidth + "," + Game.Grid.numTileHeight);
                     }
+                    break;
+                case 'G':
+                    line = line.Substring(2);
+                    tempIndexes = line.Split(',').Select(x => int.Parse(x)).ToArray();
+
+                    Game.Walls.Add(new Tile(17, 17, 17, 17, 5));
 
                     break;
                 default:
@@ -110,11 +128,22 @@ namespace C_Sharp_Final_Project
         }
         /*  IMPORTANT:
             ALL PROPERTIES are in TILES UNITS not actual PIXEL UNITS
-            
-            Start drawing level: L> widthxheight *MUST INCLUDE IN FILE. Preferably 30x20. THIS IS TILE UNITS.
+
+            Drawing scenes: add "screen:" on top of file
+                *NOTE: When creating level button png, make sure to name it: "Button_[level txt name].png" 
+                For Example: "Button_level1.png"
+
+            **NOTE do not actually put the ".png" or ".txt" for the name, this is just the file type.
+
+            Drawing levels: add "game:" on top of file
+                NOTE: When creating levels, make sure to name it like: "level[level number].txt"
+                For Example: "level1.txt"
+
+            **NOTE: ALWAYS DRAW PLAYER FIRST
+            Drawing a player: P> x, y
             Drawing a wall: W> topleftx, toplefty, bottomrightx, bottomrighty
             Drawing an enemy: E> x, y
-            Drawing a player: P> x, y
+            Drawing a goal: G> x, y
         */
     }
 }

@@ -14,11 +14,12 @@ namespace C_Sharp_Final_Project
         private Vector direction;
         private Vector newPosition;
         private bool playerBullet;
+        private int damage;
 
-        public Bullet(bool playerBullet, Vector position, Vector targetpos, string texture)
+        public Bullet(bool playerBullet, Vector position, Vector targetpos, string texture, int damage)
         {
             this.playerBullet = playerBullet;
-
+            this.damage = damage;
             double distance = Component.DistanceOfPoints(position, targetpos);
             this.position = position;
             direction = (targetpos - position) / distance;
@@ -27,7 +28,7 @@ namespace C_Sharp_Final_Project
             dest.w = 16;
             dest.h = 16;
         }
-        
+
         public void Update()
         {
             newPosition = position + velocity * 5;
@@ -45,7 +46,7 @@ namespace C_Sharp_Final_Project
             {
                 if (Component.DistanceOfPointsLessThan(Game.Player.position, position, Game.Player.radius + 8))
                 {
-                    Game.Player.Hit();
+                    Game.Player.Hit(damage);
                     Game.Bullets.Remove(this);
                 }
             }

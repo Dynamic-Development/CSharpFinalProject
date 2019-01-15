@@ -1,5 +1,5 @@
 # C# Final Project
-> For our C# project, we decided to create a game called __Space Mafia__. It is a 2D top down shooter game that uses SDL2 as our graphic engine. 
+> For our C# project, we decided to create a game called __Space Mafia__. It is a 2D top down shooter game that uses SDL2 as our graphic engine. All visuals were done custom through use of an online sprite-creation program called PISKEL. Piskel turns drawn images into png files, spritesheets, or even gifs. 
 
 ## Videos
 * Playthrough: https://www.youtube.com/watch?v=hKPNDB3E0bQ

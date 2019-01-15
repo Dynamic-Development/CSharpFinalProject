@@ -131,8 +131,9 @@ namespace C_Sharp_Final_Project
 
                 if (path != null)
                 {
-                    if (currentTargetIndex < path.Count)
+                    if (currentTargetIndex < path.Count )
                     {
+
                         position = LocateNextPosition();
                         degrees = Math.Atan2(direction.Y, direction.X) * 180 / Math.PI;
 

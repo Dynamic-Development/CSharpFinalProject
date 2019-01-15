@@ -3,6 +3,7 @@
 
 ## Install Instructions
 > To succesfully install the game, first dowload the Zip file, extract the entire file, run Space Mafia.exe
+> Controls: WASD for movement, Left Mouse Click to shoot.
 
 ## Videos
 * Playthrough: https://www.youtube.com/watch?v=hKPNDB3E0bQ

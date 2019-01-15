@@ -7,3 +7,7 @@
 
 ## Flowchart
 ![flowchart](https://github.com/Dynamic-Development/CSharpFinalProject/blob/master/flowchart.png)
+
+## Contact Us
+* Nhan Tran: nt305748@gmail.com
+* Kris Simmonds: kristofer.simmonds@gmail.com
